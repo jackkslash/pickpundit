@@ -5,7 +5,7 @@ export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {session != null ? (
-        <div>
+        <div className="flex flex-col items-center justify-center space-y-4">
           <p>Hello {session.user?.name} !</p>
           <form
             action={async () => {
@@ -15,20 +15,18 @@ export default async function Home() {
           >
             <button type="submit">Sign Out</button>
           </form>
+          <a href="/me">Me</a>
         </div>
       ) : (
         <form
           action={async () => {
             "use server"
-            await signIn("reddit")
+            await signIn("google")
           }}
         >
           <button type="submit">Signin with Google</button>
         </form>
       )}
-      <pre>
-        {JSON.stringify(session, null, 2)}
-      </pre>
     </main>
   );
 }
