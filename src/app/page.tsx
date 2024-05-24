@@ -6,7 +6,7 @@ export default async function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {session != null ? (
         <div className="flex flex-col items-center justify-center space-y-4">
-          <p>Hello {session.user?.name} !</p>
+          <p>Hello {session.user?.username} !</p>
           <form
             action={async () => {
               "use server"

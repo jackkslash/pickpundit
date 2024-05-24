@@ -3,9 +3,9 @@ import { NodePgDatabase, drizzle } from "drizzle-orm/node-postgres"
 import * as schema from "./schema"
 
 const pool = new Pool({
-    connectionString: process.env.AUTH_DRIZZLE_URL!,
+    connectionString: process.env.DB_URL!,
 })
 
-const db = drizzle(pool, { schema }) as NodePgDatabase<typeof schema>
+const db = drizzle(pool, { schema })
 
 export default db
