@@ -4,6 +4,7 @@ import {
     text,
     primaryKey,
     integer,
+    serial,
 } from "drizzle-orm/pg-core"
 import { AdapterAccountType } from "next-auth/adapters"
 
@@ -61,3 +62,12 @@ export const verificationTokens = pgTable(
         compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
     })
 )
+
+export const competitions = pgTable("competition", {
+    id: serial("id").primaryKey(),
+    formalName: text("formalName").notNull(),
+    informalName: text("informalName"),
+    code: text("code").notNull(),
+    type: text("type").notNull(),
+    emblem: text("emblem"),
+})
