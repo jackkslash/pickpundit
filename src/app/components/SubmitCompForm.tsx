@@ -1,29 +1,17 @@
+'use client'
 
-import db from '@/db';
-import { competitions } from '@/db/schema';
-import { revalidatePath } from 'next/cache';
-import React from 'react'
+import React, { useRef } from 'react'
 
 export default function
-    () {
+    ({ SubmitComp }: any) {
+    const ref = useRef<HTMLFormElement>(null)
+
     return (
         <div>
-            <form className="flex flex-col gap-2"
-                action={async (formData: FormData) => {
-                    "use server"
-                    const leagueData = {
-                        formalName: formData.get("formalName") as string,
-                        informalName: formData.get("informalName") as string,
-                        code: formData.get("code") as string,
-                        type: formData.get("type") as string,
-                        emblem: formData.get("emblem") as string,
-                    }
-
-                    await db.insert(competitions).values(
-                        leagueData
-                    )
-
-                    revalidatePath("/dashboard")
+            <form className="flex flex-col gap-2" ref={ref}
+                action={async (formData) => {
+                    await SubmitComp(formData)
+                    ref.current?.reset()
                 }}
             >
                 <label htmlFor="formalName">Formal Name</label>

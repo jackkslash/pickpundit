@@ -1,9 +1,10 @@
 import { auth, signOut } from "@/auth"
-import Competitions from "@/components/Competitions";
-import SubmitCompForm from "@/components/SubmitCompForm";
+import Competitions from "@/app/components/Competitions";
+import SubmitCompForm from "@/app/components/SubmitCompForm";
 import db from "@/db";
 import { competitions } from "@/db/schema";
 import { redirect } from "next/navigation";
+import { SubmitComp } from "../actions/actions";
 
 export default async function Home() {
     const session = await auth();
@@ -28,7 +29,7 @@ export default async function Home() {
 
             </div>
             <Competitions comps={data} />
-            <SubmitCompForm />
+            <SubmitCompForm SubmitComp={SubmitComp} />
         </main>
     );
 }
