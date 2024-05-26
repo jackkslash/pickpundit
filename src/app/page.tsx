@@ -16,6 +16,7 @@ export default async function Home() {
             <button type="submit">Sign Out</button>
           </form>
           <a href="/me">Me</a>
+          <a href="/dashboard">Dashboard</a>
         </div>
       ) : (
         <form
