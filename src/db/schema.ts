@@ -7,6 +7,7 @@ import {
     serial,
 } from "drizzle-orm/pg-core"
 import { AdapterAccountType } from "next-auth/adapters"
+import { createStyleRegistry } from "styled-jsx"
 
 export const users = pgTable("user", {
     id: text("id")
@@ -70,4 +71,17 @@ export const competitions = pgTable("competition", {
     code: text("code").notNull(),
     type: text("type").notNull(),
     emblem: text("emblem"),
+})
+
+export const teams = pgTable("team", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull(),
+    shortName: text("shortName"),
+    tla: text("tla"),
+    crest: text("crest"),
+    address: text("address"),
+    website: text("website"),
+    founded: timestamp("founded", { mode: "string" }),
+    clubColors: text("clubColors"),
+    venue: text("venue")
 })
