@@ -22,6 +22,8 @@ export default async function Home() {
                         const u = formData.get("username") as string
                         await db.update(users).set({ username: u })
                             .where(eq(users.email, session?.user?.email as string))
+
+                        redirect("/")
                     }}
                 >
                     <input type="text" name="username" />

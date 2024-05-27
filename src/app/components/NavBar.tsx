@@ -16,7 +16,11 @@ export default async function NavBar() {
                         <button type="submit">Sign Out</button>
                     </form>
                     <a href="/me">Me</a>
-                    <a href="/dashboard">Dashboard</a>
+                    {session.user.role == "admin" ? (
+                        <a href="/dashboard">Dashboard</a>
+                    ) : (
+                        null
+                    )}
                 </div>
 
 

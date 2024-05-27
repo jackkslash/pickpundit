@@ -11,7 +11,7 @@ import SubmitTeamForm from "../components/SubmitTeamForm";
 export default async function Home() {
     const session = await auth();
 
-    if (session == null) {
+    if (session == null || session.user.role != "admin") {
         redirect("/")
     }
 

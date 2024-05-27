@@ -1,4 +1,4 @@
-import { auth, signIn, signOut } from "@/auth"
+import { auth } from "@/auth"
 
 export default async function Home() {
   const session = await auth();
