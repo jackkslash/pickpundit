@@ -7,6 +7,12 @@ export default async function NavBar() {
             <a href="/">Home</a>
             {session != null ? (
                 <div className='flex flex-row items-center justify-center space-x-4'>
+                    <a href="/me">Me</a>
+                    {session?.user.role == "admin" ? (
+                        <a href="/dashboard">Dashboard</a>
+                    ) : (
+                        null
+                    )}
                     <form
                         action={async () => {
                             "use server";
@@ -15,12 +21,7 @@ export default async function NavBar() {
                     >
                         <button type="submit">Sign Out</button>
                     </form>
-                    <a href="/me">Me</a>
-                    {session.user.role == "admin" ? (
-                        <a href="/dashboard">Dashboard</a>
-                    ) : (
-                        null
-                    )}
+
                 </div>
 
 
