@@ -85,3 +85,13 @@ export const teams = pgTable("team", {
     clubColors: text("clubColors"),
     venue: text("venue")
 })
+
+export const teamsCompetitions = pgTable("teamsCompetition", {
+    teamId: integer("teamId")
+        .notNull()
+        .references(() => teams.id, { onDelete: "cascade" }),
+    competitionId: integer("competitionId")
+        .notNull()
+        .references(() => competitions.id, { onDelete: "cascade" }),
+})
+

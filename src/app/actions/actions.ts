@@ -27,7 +27,7 @@ export async function SubmitTeam(formData: FormData) {
         shortName: formData.get("shortName") as string,
         tla: formData.get("tla") as string,
         crest: formData.get("crest") as string,
-        addres: formData.get("addres") as string,
+        address: formData.get("address") as string,
         website: formData.get("website") as string,
         founded: formData.get("founded") as string,
         clubColors: formData.get("clubColors") as string,
