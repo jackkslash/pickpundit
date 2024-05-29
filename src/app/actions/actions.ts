@@ -2,6 +2,7 @@
 
 import db from "@/db"
 import { competitions, teams } from "@/db/schema"
+import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 
 
@@ -18,6 +19,11 @@ export async function SubmitComp(formData: FormData) {
         leagueData
     )
 
+    revalidatePath("/dashboard")
+}
+
+export async function DeleteComp(competitionId: any) {
+    await db.delete(competitions).where(eq(competitions.id, competitionId))
     revalidatePath("/dashboard")
 }
 
@@ -38,5 +44,10 @@ export async function SubmitTeam(formData: FormData) {
         teamData
     )
 
+    revalidatePath("/dashboard")
+}
+
+export async function DeleteTeam(teamId: any) {
+    await db.delete(teams).where(eq(teams.id, teamId))
     revalidatePath("/dashboard")
 }

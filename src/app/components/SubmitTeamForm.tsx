@@ -21,11 +21,11 @@ export default function
                 <label htmlFor="crest">Crest</label>
                 <input className="text-black" type="text" name="crest" />
                 <label htmlFor="addres">Address</label>
-                <input className="text-black" type="text" name="address" />
+                <input className="text-black" type="test" name="address" />
                 <label htmlFor="website">Website</label>
                 <input className="text-black" type="text" name="website" />
                 <label htmlFor="founded">Founded</label>
-                <input className="text-black" type="text" name="founded" />
+                <input className="text-black" type="date" name="founded" />
                 <label htmlFor="clubColors">Club Colors</label>
                 <input className="text-black" type="text" name="clubColors" />
                 <label htmlFor="venue">Venue</label>
