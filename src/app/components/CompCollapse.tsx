@@ -20,7 +20,7 @@ const CompCollapse = ({ competition }: { competition: any }) => {
                 <p>Type: {competition.type}</p>
                 <br />
                 <div className='flex gap-2'>
-                    <Link href={`/dashboard/comps/` + competition.id + `?formalName=` + competition.formalName}>Edit</Link>
+                    <Link href={`/dashboard/comps/` + competition.id + `?formalName=` + competition.formalName + '&type=' + competition.type}>Edit</Link>
                     <br />
                     <form action={deleteCompWithId}>
                         <button type="submit">Delete</button>

@@ -1,7 +1,7 @@
 "use server"
 
 import db from "@/db"
-import { competitions, teams } from "@/db/schema"
+import { competitions, groupTeams, teams } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 
@@ -43,11 +43,20 @@ export async function SubmitTeam(formData: FormData) {
     await db.insert(teams).values(
         teamData
     )
-
-    revalidatePath("/dashboard")
 }
 
 export async function DeleteTeam(teamId: any) {
     await db.delete(teams).where(eq(teams.id, teamId))
-    revalidatePath("/dashboard")
+    revalidatePath("/")
+}
+
+export async function SubmitTeamToGroup(formData: FormData) {
+    const gId = formData.get("id") as unknown as number
+    const cId = formData.get("teamId") as unknown as number
+
+    await db.insert(groupTeams).values({
+        groupId: gId,
+        teamId: cId,
+    })
+    revalidatePath("/")
 }

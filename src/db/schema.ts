@@ -95,3 +95,20 @@ export const teamsCompetitions = pgTable("teamsCompetition", {
         .references(() => competitions.id, { onDelete: "cascade" }),
 })
 
+
+export const groups = pgTable("group", {
+    id: serial("id").primaryKey(),
+    competitionId: integer("competitionId")
+        .notNull()
+        .references(() => competitions.id, { onDelete: "cascade" }),
+    name: text("name").notNull()
+})
+
+export const groupTeams = pgTable("groupTeam", {
+    groupId: integer("groupId")
+        .notNull()
+        .references(() => groups.id, { onDelete: "cascade" }),
+    teamId: integer("teamId")
+        .notNull()
+        .references(() => teams.id, { onDelete: "cascade" }),
+})

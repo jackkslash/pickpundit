@@ -1,11 +1,31 @@
+import { SubmitTeamToGroup } from '@/app/actions/actions'
 import db from '@/db'
-import { competitions, teamsCompetitions, teams } from '@/db/schema'
+import { competitions, teamsCompetitions, teams, groups, groupTeams } from '@/db/schema'
 import { and, asc, eq } from 'drizzle-orm'
-import { get } from 'http'
 import { revalidatePath } from 'next/cache'
 import React from 'react'
 
-export default async function page({ params, searchParams }: { params: { id: number }, searchParams: { formalName: string } }) {
+export default async function page({ params, searchParams }: { params: { id: number }, searchParams: { formalName: string, type: string } }) {
+
+
+    //all teams in competition
+    // const comp = await db.select({
+    //     id: teams.id,
+    //     name: teams.name,
+    //     shortName: teams.shortName,
+    //     tla: teams.tla,
+    //     crest: teams.crest,
+    //     address: teams.address,
+    //     website: teams.website,
+    //     founded: teams.founded,
+    //     clubColors: teams.clubColors,
+    //     venue: teams.venue,
+    // })
+    //     .from(teams)
+    //     .innerJoin(teamsCompetitions, eq(teams.id, teamsCompetitions.teamId))
+    //     .innerJoin(competitions, eq(teamsCompetitions.competitionId, competitions.id))
+    //     .where(eq(competitions.id, params.id))
+
 
     const comp = await db.select({
         id: teams.id,
@@ -17,21 +37,35 @@ export default async function page({ params, searchParams }: { params: { id: num
         website: teams.website,
         founded: teams.founded,
         clubColors: teams.clubColors,
-        venue: teams.venue
+        venue: teams.venue,
+        group: groups.name
     })
         .from(teams)
-        .innerJoin(teamsCompetitions, eq(teams.id, teamsCompetitions.teamId))
-        .innerJoin(competitions, eq(teamsCompetitions.competitionId, competitions.id))
+        .fullJoin(teamsCompetitions, eq(teams.id, teamsCompetitions.teamId))
+        .fullJoin(competitions, eq(teamsCompetitions.competitionId, competitions.id))
+        .fullJoin(groupTeams, eq(teams.id, groupTeams.teamId))
+        .fullJoin(groups,
+            and(
+                eq(groupTeams.groupId, groups.id),
+                eq(competitions.id, groups.competitionId))
+        )
         .where(eq(competitions.id, params.id))
 
+    //all teams in db
     const allTeams = await db.query.teams.findMany(
         { orderBy: [asc(teams.name)] }
     );
-    console.log(comp)
+    //all groups in db
+    const allGroups = await db.select().from(groups).where(eq(groups.competitionId, params.id))
+
+    console.log("comp", comp)
+
+
     return (
         <div>
-            <h1>{searchParams.formalName}</h1>
-            {comp.map((c) =>
+            <h1>{searchParams.formalName} {searchParams.type}</h1>
+            <h2>Teams</h2>
+            {comp.map((c: any) =>
                 <div>
                     <p>{c.id}</p>
                     <p>{c.name}</p>
@@ -43,6 +77,23 @@ export default async function page({ params, searchParams }: { params: { id: num
                     <p>{c.founded}</p>
                     <p>{c.clubColors}</p>
                     <p>{c.venue}</p>
+                    {c.group && <p>{c.group}</p>}
+                    {searchParams.type === "CUP" &&
+
+                        <div>
+                            <form action={SubmitTeamToGroup}>
+                                <select className='text-black' name='id'>
+                                    {allGroups.map((g) =>
+
+                                        <option className='text-black' value={g.id}>{g.name}</option>
+
+                                    )}
+                                    <input type="hidden" name="teamId" value={c.id} />
+                                </select>
+                                <button type="submit">Add</button>
+                            </form>
+                        </div>
+                    }
                     <br />
                     <form action={async () => {
                         "use server"
@@ -51,7 +102,27 @@ export default async function page({ params, searchParams }: { params: { id: num
                             eq(teamsCompetitions.competitionId, params.id)
                         )
                         )
-                        revalidatePath("/dashboard/comps/" + params.id + "?formalName=" + searchParams.formalName)
+                        revalidatePath("/")
+                    }}>
+                        <button type="submit">DELETE TEAM</button>
+                    </form>
+                    <br />
+
+                </div>)}
+            <h2>Groups</h2>
+            {allGroups.map((g) =>
+                <div>
+                    <p>Group: {g.name}</p>
+                    <p>Comp: {g.competitionId}</p>
+                    <br />
+                    <form action={async () => {
+                        "use server"
+                        await db.delete(groups).where(and(
+                            eq(groups.id, g.id),
+                            eq(groups.competitionId, params.id)
+                        )
+                        )
+                        revalidatePath("/dashboard/comps/" + params.id + "?formalName=" + searchParams.formalName + "&type=" + searchParams.type)
                     }}>
                         <button type="submit">DELETE</button>
                     </form>
@@ -60,6 +131,25 @@ export default async function page({ params, searchParams }: { params: { id: num
                 </div>)}
 
             <div>
+                {searchParams.type === "CUP" &&
+                    <div>
+                        <form action={async (formData) => {
+                            "use server"
+                            const name = formData.get("group") as string
+                            await db.insert(groups).values({
+                                competitionId: params.id,
+                                name: name
+                            })
+                            revalidatePath("/")
+                        }}>
+                            <label htmlFor="group" />
+                            <input className='text-black' type="text" name='group' />
+                            <button type="submit">Add</button>
+                        </form>
+                    </div>
+                }
+
+
                 <form action={async (formData) => {
                     "use server"
 
@@ -69,7 +159,7 @@ export default async function page({ params, searchParams }: { params: { id: num
                         teamId: id,
                         competitionId: params.id
                     })
-                    revalidatePath("/dashboard/comps/" + params.id + "?formalName=" + searchParams.formalName)
+                    revalidatePath("/")
                 }}>
                     <select className='text-black' name='id'>
                         <option value={0}>Select a team</option>

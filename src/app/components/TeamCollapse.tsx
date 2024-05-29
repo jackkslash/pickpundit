@@ -9,6 +9,7 @@ const TeamCollapse = ({ team }: { team: any }) => {
     };
 
     const deleteTeamWithId = DeleteTeam.bind(null, team.id);
+
     return (
         <div>
             <button onClick={toggle}>{team.name} ({team.tla})</button>
@@ -22,6 +23,7 @@ const TeamCollapse = ({ team }: { team: any }) => {
                 <p>{team.founded}</p>
                 <p>{team.clubColors}</p>
                 <p>{team.venue}</p>
+                {team.group && <p>{team.group}</p>}
                 <form action={deleteTeamWithId}>
                     <button type="submit">DELETE</button>
                 </form>
