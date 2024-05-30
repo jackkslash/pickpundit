@@ -19,12 +19,12 @@ export async function SubmitComp(formData: FormData) {
         leagueData
     )
 
-    revalidatePath("/dashboard")
+    revalidatePath("/")
 }
 
 export async function DeleteComp(competitionId: any) {
     await db.delete(competitions).where(eq(competitions.id, competitionId))
-    revalidatePath("/dashboard")
+    revalidatePath("/")
 }
 
 export async function SubmitTeam(formData: FormData) {
@@ -43,6 +43,8 @@ export async function SubmitTeam(formData: FormData) {
     await db.insert(teams).values(
         teamData
     )
+
+    revalidatePath("/")
 }
 
 export async function DeleteTeam(teamId: any) {

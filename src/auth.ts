@@ -30,7 +30,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     callbacks: {
         async session({ session, user }) {
             session.user.id = user.id
-            console.log(session, user)
             return session
         },
     },
