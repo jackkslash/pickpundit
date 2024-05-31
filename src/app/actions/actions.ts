@@ -1,8 +1,8 @@
 "use server"
 
 import db from "@/db"
-import { competitions, groupTeams, teams } from "@/db/schema"
-import { eq } from "drizzle-orm"
+import { competitions, groupTeams, teams, teamsCompetitions } from "@/db/schema"
+import { and, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 
 
@@ -47,8 +47,23 @@ export async function SubmitTeam(formData: FormData) {
     revalidatePath("/")
 }
 
-export async function DeleteTeam(teamId: any) {
-    await db.delete(teams).where(eq(teams.id, teamId))
+export async function DeleteTeam(teamId: any, competitionId: any) {
+
+    if (!competitionId) {
+        console.log("no competition id")
+        await db.delete(teams).where(eq(teams.id, teamId))
+    } else {
+        console.log("competition id")
+        await db.delete(teamsCompetitions).where(and(
+            eq(teamsCompetitions.teamId, teamId),
+            eq(teamsCompetitions.competitionId, competitionId)
+        )
+        )
+
+        await db.delete(groupTeams).where(eq(groupTeams.teamId, teamId)
+        )
+    }
+
     revalidatePath("/")
 }
 

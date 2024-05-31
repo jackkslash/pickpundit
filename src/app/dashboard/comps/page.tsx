@@ -1,6 +1,6 @@
 import { SubmitComp } from "@/app/actions/actions";
 import Competitions from "@/app/components/Competitions";
-import SubmitCompForm from "@/app/components/SubmitCompForm";
+import CompForm from "@/app/components/CompForm";
 import db from "@/db";
 import { competitions } from "@/db/schema";
 
@@ -10,7 +10,7 @@ export default async function Comps() {
         <div className="flex min-h-screen flex-col items-center py-6 space-y-10">
             <Competitions comps={dataComps} />
             <br />
-            <SubmitCompForm SubmitComp={SubmitComp} />
+            <CompForm SubmitComp={SubmitComp} />
         </div>
     )
 }

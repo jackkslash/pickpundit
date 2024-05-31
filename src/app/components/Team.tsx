@@ -2,13 +2,13 @@
 import { useState } from "react";
 import { DeleteTeam } from "../actions/actions";
 
-const TeamCollapse = ({ team }: { team: any }) => {
+const Team = ({ team, children, competitionId }: { team: any, children?: any, competitionId?: any }) => {
     const [open, setOPen] = useState(false);
     const toggle = () => {
         setOPen(!open);
     };
 
-    const deleteTeamWithId = DeleteTeam.bind(null, team.id);
+    const deleteTeamBind = DeleteTeam.bind(null, team.id, competitionId);
 
     return (
         <div>
@@ -24,12 +24,15 @@ const TeamCollapse = ({ team }: { team: any }) => {
                 <p>{team.clubColors}</p>
                 <p>{team.venue}</p>
                 {team.group && <p>{team.group}</p>}
-                <form action={deleteTeamWithId}>
+
+                <form action={deleteTeamBind}>
                     <button type="submit">DELETE</button>
                 </form>
+                {children}
+
             </div>}
         </div>
     );
 };
 
-export default TeamCollapse;
+export default Team;

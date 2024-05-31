@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { DeleteComp } from "../actions/actions";
 
-const CompCollapse = ({ competition }: { competition: any }) => {
+const Comp = ({ competition }: { competition: any }) => {
     const [open, setOPen] = useState(false);
     const toggle = () => {
         setOPen(!open);
@@ -32,4 +32,4 @@ const CompCollapse = ({ competition }: { competition: any }) => {
     );
 };
 
-export default CompCollapse;
+export default Comp;

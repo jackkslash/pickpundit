@@ -19,7 +19,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <header className="flex flex-col items-center justify-center space-y-4">
-          {/*@ts-expect-error*/}
           <NavBar />
         </header>
         <main>
