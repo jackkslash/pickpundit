@@ -67,23 +67,30 @@ export async function DeleteTeam(teamId: any, competitionId: any) {
     revalidatePath("/")
 }
 
-export async function SubmitTeamToGroup(formData: FormData) {
+export async function SubmitTeamToGroup(teamId: any, formData: FormData,) { // 
     const gId = formData.get("id") as unknown as number
-    const cId = formData.get("teamId") as unknown as number
 
     await db.insert(groupTeams).values({
         groupId: gId,
-        teamId: cId,
+        teamId: teamId,
     })
     revalidatePath("/")
 }
 
-export async function AddTeamToComp(formData: FormData, competitionId: any) {
+export async function AddTeamToComp(competitionId: any, formData: FormData,) {
     const cId = formData.get("id") as unknown as number
-
-    await db.insert(teamsCompetitions).values({
-        teamId: cId,
-        competitionId: competitionId
-    })
-    revalidatePath("/")
+    const exists = await db.select().from(teamsCompetitions)
+        .where(eq(teamsCompetitions.teamId, cId))
+    console.log("exists", exists)
+    if (exists.length == 0) {
+        await db.insert(teamsCompetitions).values({
+            teamId: cId,
+            competitionId: competitionId
+        })
+        revalidatePath("/")
+    }
+    return
 }
+
+
+

@@ -44,7 +44,7 @@ export default async function page({ params, searchParams }: { params: { id: num
                         {searchParams.type === "CUP" &&
                             c.id != null &&
                             c.group == null &&
-                            <AssignGroupForm groupList={allGroups} competitionId={params.id} />
+                            <AssignGroupForm groupList={allGroups} teamId={c.id} />
                         }
                     </Team>
                 </div>)}

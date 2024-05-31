@@ -8,7 +8,7 @@ export default async function AddTeamForm({ competitionId }: { competitionId: an
         { orderBy: [asc(teams.name)] }
     );
 
-    const AddTeamToCompWithCompID = AddTeamToComp.bind(null, competitionId)
+    const AddTeamToCompWithCompID = AddTeamToComp.bind(null, competitionId);
 
     return (
         <div>
