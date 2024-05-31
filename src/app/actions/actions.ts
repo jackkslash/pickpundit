@@ -77,3 +77,13 @@ export async function SubmitTeamToGroup(formData: FormData) {
     })
     revalidatePath("/")
 }
+
+export async function AddTeamToComp(formData: FormData, competitionId: any) {
+    const cId = formData.get("id") as unknown as number
+
+    await db.insert(teamsCompetitions).values({
+        teamId: cId,
+        competitionId: competitionId
+    })
+    revalidatePath("/")
+}
