@@ -1,10 +1,11 @@
+import { AddGroup } from '@/app/actions/actions'
 import AddTeamForm from '@/app/components/AddTeamForm'
 import AssignGroupForm from '@/app/components/AssignGroupForm'
-import Groups from '@/app/components/Groups'
+import Group from '@/app/components/Group'
 import Team from '@/app/components/Team'
 import db from '@/db'
 import { competitions, teamsCompetitions, teams, groups, groupTeams } from '@/db/schema'
-import { and, eq } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 import React from 'react'
 
 export default async function page({ params, searchParams }: { params: { id: number }, searchParams: { formalName: string, type: string } }) {
@@ -34,6 +35,10 @@ export default async function page({ params, searchParams }: { params: { id: num
         .where(eq(competitions.id, params.id))
 
     const allGroups = await db.select().from(groups).where(eq(groups.competitionId, params.id))
+    const allTeams = await db.query.teams.findMany(
+        { orderBy: [asc(teams.name)] }
+    );
+    const AddGroupWithId = AddGroup.bind(null, params.id)
     return (
         <div>
             <h1>{searchParams.formalName} {searchParams.type}</h1>
@@ -49,13 +54,22 @@ export default async function page({ params, searchParams }: { params: { id: num
                     </Team>
                 </div>)}
             <br />
-            <AddTeamForm competitionId={params.id} />
+            <AddTeamForm allTeams={allTeams} competitionId={params.id} />
             <br />
             <div>
                 <h2>Groups</h2>
-                {searchParams.type === "CUP" &&
-                    <Groups id={params.id} groupList={allGroups} />
-                }
+                {searchParams.type === "CUP" && (
+                    allGroups.map((g: any) => (
+                        <div key={g.id}>
+                            <Group id={params.id} g={g} />
+                        </div>
+                    ))
+                )}
+                <form action={AddGroupWithId}>
+                    <label htmlFor="group" />
+                    <input className='text-black' type="text" name='group' />
+                    <button type="submit">Add</button>
+                </form>
             </div>
         </div>
     )

@@ -1,7 +1,7 @@
 "use server"
 
 import db from "@/db"
-import { competitions, groupTeams, teams, teamsCompetitions } from "@/db/schema"
+import { competitions, groupTeams, groups, teams, teamsCompetitions } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 
@@ -92,5 +92,21 @@ export async function AddTeamToComp(competitionId: any, formData: FormData,) {
     return
 }
 
+export async function DeleteGroup(groupId: any, competitionId: any) {
+    await db.delete(groups).where(and(
+        eq(groups.id, groupId),
+        eq(groups.competitionId, competitionId)
+    )
+    )
+    revalidatePath("/")
+}
 
+export async function AddGroup(id: number, formData: FormData) {
+    const name = formData.get("group") as string
+    await db.insert(groups).values({
+        competitionId: id,
+        name: name
+    })
+    revalidatePath("/")
+}
 

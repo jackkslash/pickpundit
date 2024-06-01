@@ -1,12 +1,6 @@
-import db from "@/db"
-import { teams } from "@/db/schema"
-import { asc } from "drizzle-orm";
 import { AddTeamToComp } from "../actions/actions";
 
-export default async function AddTeamForm({ competitionId }: { competitionId: any }) {
-    const allTeams = await db.query.teams.findMany(
-        { orderBy: [asc(teams.name)] }
-    );
+export default function AddTeamForm({ allTeams, competitionId }: { allTeams: any, competitionId: any }) {
 
     const AddTeamToCompWithCompID = AddTeamToComp.bind(null, competitionId);
 
@@ -17,7 +11,7 @@ export default async function AddTeamForm({ competitionId }: { competitionId: an
                 <select className='text-black' name='id'>
                     <option value={0}>Select a team</option>
                     {
-                        allTeams.map((t) =>
+                        allTeams.map((t: any) =>
                             <option className='text-black' value={t.id}>{t.name}</option>
                         )
                     }</select>
