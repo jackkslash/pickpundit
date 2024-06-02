@@ -6,7 +6,8 @@ export default function Layout({ children }: Readonly<{
     return (
         <>
             <AdminNavBar />
-            <main>{children}</main>
+            <main>{children}
+            </main>
         </>
     )
 }
