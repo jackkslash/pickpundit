@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
 const competitionSchema = z.object({
+    id: z.number().min(1),
     formalName: z.string().min(1),
     informalName: z.string().min(1),
     code: z.string().min(1),
@@ -15,6 +16,7 @@ const competitionSchema = z.object({
 })
 
 const teamSchema = z.object({
+    id: z.number().min(1),
     name: z.string().min(1),
     shortName: z.string().min(1),
     tla: z.string().min(1),
@@ -27,30 +29,38 @@ const teamSchema = z.object({
 })
 
 const groupSchema = z.object({
-    id: z.number().min(1).optional(),
-    competitionId: z.number().min(1),
+    id: z.number().min(1),
+    competitionId: z.coerce.number().min(1),
     name: z.string().min(1),
 })
 
 const groupTeamSchema = z.object({
     teamId: z.number().min(1),
-    groupId: z.number().min(1),
+    groupId: z.coerce.number().min(1),
 })
 
 const teamsCompetitionsSchema = z.object({
-    teamId: z.number().min(1),
-    competitionId: z.number().min(1),
+    teamId: z.coerce.number().min(1),
+    competitionId: z.coerce.number().min(1),
 })
 
 export async function SubmitComp(formData: FormData) {
     try {
-        const competition = competitionSchema.safeParse({
+        const competitionPartialSchema = competitionSchema.pick({
+            formalName: true,
+            informalName: true,
+            code: true,
+            type: true,
+            emblem: true
+        });
+
+        const competition = competitionPartialSchema.safeParse({
             formalName: formData.get("formalName"),
             informalName: formData.get("informalName"),
             code: formData.get("code"),
             type: formData.get("type"),
             emblem: formData.get("emblem")
-        })
+        });
         if (!competition.success) {
             return {
                 type: "error",
@@ -78,16 +88,18 @@ export async function SubmitComp(formData: FormData) {
 export async function DeleteComp(competitionId: number) {
 
     try {
-        const cIdSchema = z.number().min(1)
-        const cId = cIdSchema.safeParse(competitionId)
-        if (!cId.success) {
+        const compPartialSchema = competitionSchema.pick({
+            id: true
+        })
+        const compId = compPartialSchema.safeParse({ id: competitionId })
+        if (!compId.success) {
             return {
                 type: "error",
-                message: cId.error.message
+                message: compId.error.message
             }
         }
 
-        await db.delete(competitions).where(eq(competitions.id, cId.data))
+        await db.delete(competitions).where(eq(competitions.id, compId.data.id))
         revalidatePath("/")
         return {
             type: "success",
@@ -104,7 +116,18 @@ export async function DeleteComp(competitionId: number) {
 export async function SubmitTeam(formData: FormData) {
 
     try {
-        const team = teamSchema.safeParse({
+        const teamPartialSchema = teamSchema.pick({
+            name: true,
+            shortName: true,
+            tla: true,
+            crest: true,
+            address: true,
+            website: true,
+            founded: true,
+            clubColors: true,
+            venue: true
+        });
+        const team = teamPartialSchema.safeParse({
             name: formData.get("name"),
             shortName: formData.get("shortName"),
             tla: formData.get("tla"),
@@ -114,8 +137,7 @@ export async function SubmitTeam(formData: FormData) {
             founded: formData.get("founded"),
             clubColors: formData.get("clubColors"),
             venue: formData.get("venue"),
-        })
-
+        });
         if (!team.success) {
             return {
                 type: "error",
@@ -140,46 +162,73 @@ export async function SubmitTeam(formData: FormData) {
     }
 }
 
-//ZOD'd this
-
 export async function DeleteTeam(teamId: number, competitionId: number) {
     try {
-
         if (!competitionId) {
-            console.log("no competition id")
-            await db.delete(teams).where(eq(teams.id, teamId))
-        } else {
-            console.log("competition id")
-            await db.delete(teamsCompetitions).where(and(
-                eq(teamsCompetitions.teamId, teamId),
-                eq(teamsCompetitions.competitionId, competitionId)
-            )
-            )
+            const teamCompsPartialSchema = teamsCompetitionsSchema.pick({
+                teamId: true,
+            })
+            const tId = teamCompsPartialSchema.safeParse({ teamId: teamId })
+            if (!tId.success) {
+                console.log(tId.error.message);
+                return {
+                    type: "error",
+                    message: tId.error.message
+                };
+            }
 
-            await db.delete(groupTeams).where(eq(groupTeams.teamId, teamId)
-            )
+            await db.delete(teams).where(eq(teams.id, tId.data.teamId));
+        } else {
+            const teamCompsPartialSchema = teamsCompetitionsSchema.pick({
+                teamId: true,
+                competitionId: true
+            })
+            const teamComps = teamCompsPartialSchema.safeParse({
+                teamId: teamId,
+                competitionId: competitionId
+            });
+
+            if (!teamComps.success) {
+                return {
+                    type: "error",
+                    message: teamComps.error.message
+                };
+            }
+
+            await db.delete(teamsCompetitions).where(and(
+                eq(teamsCompetitions.teamId, teamComps.data.teamId),
+                eq(teamsCompetitions.competitionId, teamComps.data.competitionId)
+            ));
+
+            await db.delete(groupTeams).where(
+                eq(groupTeams.teamId, teamComps.data.teamId)
+            );
         }
 
-        revalidatePath("/")
+        revalidatePath("/");
+        return {
+            type: "success",
+            message: "Team deleted"
+        };
     } catch (error) {
         return {
             type: "error",
-            message: "Error delteing team: " + error
-        }
+            message: "An error occurred while deleting the team."
+        };
     }
 }
 
-export async function SubmitTeamToGroup(teamId: any, formData: FormData,) {
+export async function SubmitTeamToGroup(teamId: any, formData: FormData) {
     try {
         const groupTeam = groupTeamSchema.safeParse({
-            groupId: formData.get("groupId"),
-            teamId: formData.get("teamId")
+            teamId: teamId,
+            groupId: formData.get("id")
         })
-
+        console.log(groupTeam.data);
         if (!groupTeam.success) {
             return {
                 type: "error",
-                message: groupTeam.error.message
+                message: "Error adding team to competition: " + groupTeam.error.message
             }
         }
 
@@ -190,6 +239,7 @@ export async function SubmitTeamToGroup(teamId: any, formData: FormData,) {
             message: "Team added to group"
         }
     } catch (error) {
+        console.log(error);
         return {
             type: "error",
             message: "Error adding team to competition: " + error
@@ -201,14 +251,14 @@ export async function AddTeamToComp(competitionId: number, prevState: any, formD
     try {
 
         const teamsComp = teamsCompetitionsSchema.safeParse({
-            teamId: formData.get("teamId"),
+            teamId: formData.get("id"),
             competitionId: competitionId
         })
 
         if (!teamsComp.success) {
             return {
                 type: "error",
-                message: teamsComp.error.message
+                message: "Error adding team to competition: " + teamsComp.error.message
             }
         }
 
@@ -222,12 +272,12 @@ export async function AddTeamToComp(competitionId: number, prevState: any, formD
                 type: "success",
                 message: "Team added to competition"
             }
-        } else {
-            return {
-                type: "error",
-                message: "Team already in competition"
-            }
         }
+        return {
+            type: "error",
+            message: "Team already in competition"
+        }
+
 
     } catch (error) {
         return {
@@ -237,68 +287,88 @@ export async function AddTeamToComp(competitionId: number, prevState: any, formD
     }
 }
 
-export async function DeleteGroup(groupId: any, competitionId: any) {
+export async function DeleteGroup(groupId: number, competitionId: number) {
     try {
-        const groupSchema = z.object({
-            id: z.number().min(1),
-            competitionId: z.number().min(1)
-        })
-
-        const group = groupSchema.safeParse({
+        const group = groupSchema.pick({
+            id: true,
+            competitionId: true
+        }).safeParse({
             id: groupId,
             competitionId: competitionId
-        })
+        });
 
         if (!group.success) {
+            console.log(group.error.message);
             return {
                 type: "error",
                 message: group.error.message
-            }
+            };
         }
 
-        await db.delete(groups).where(and(
-            eq(groups.id, group.data.id),
-            eq(groups.competitionId, group.data.competitionId)
-        )
-        )
-        revalidatePath("/")
+        await db.delete(groups).where(
+            and(
+                eq(groups.id, group.data.id),
+                eq(groups.competitionId, group.data.competitionId)
+            )
+        );
+
+        revalidatePath("/");
+
         return {
             type: "success",
             message: "Group deleted"
-        }
+        };
     } catch (error) {
+        console.log(error);
         return {
             type: "error",
-            message: "Error delteing group: " + error
-        }
+            message: "Error deleting group: " + error
+        };
     }
 }
 
 export async function AddGroup(id: number, formData: FormData) {
     try {
+        const groupPartialSchema = groupSchema.pick({
+            competitionId: true,
+            name: true
+        });
 
-        const group = groupSchema.safeParse({
+        const groupName = formData.get("group");
+        if (typeof groupName !== 'string' || !groupName) {
+            return {
+                type: "error",
+                message: "Group name is required and must be a string"
+            };
+        }
+
+        const group = groupPartialSchema.safeParse({
             competitionId: id,
-            name: formData.get("group")
-        })
+            name: groupName
+        });
 
         if (!group.success) {
             return {
                 type: "error",
                 message: group.error.message
-            }
+            };
         }
-        await db.insert(groups).values(group.data)
-        revalidatePath("/")
+
+        await db.insert(groups).values({
+            competitionId: group.data.competitionId,
+            name: group.data.name
+        });
+
+        revalidatePath("/");
+
         return {
             type: "success",
             message: "Group added"
-        }
+        };
     } catch (error) {
         return {
             type: "error",
             message: "Error adding group: " + error
-        }
+        };
     }
 }
-

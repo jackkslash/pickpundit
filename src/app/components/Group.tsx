@@ -1,7 +1,7 @@
 import React from 'react'
 import { DeleteGroup } from '../actions/actions'
 
-export default async function Group({ id, g }: { id: any, g: any }) {
+export default async function Group({ id, g }: { id: number, g: any }) {
     console.log(g)
     const DeleteGroupWithId = DeleteGroup.bind(null, g.id, id)
     return (

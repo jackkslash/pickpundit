@@ -20,10 +20,10 @@ export default function AddTeamForm({ allTeams, competitionId }: { allTeams: any
                     <option value={0}>Select a team</option>
                     {
                         allTeams.map((t: any) =>
-                            <><option className='text-black' value={t.id}>{t.name}</option><input type="hidden" name="id" value={t.id} /></>
+                            <><option className='text-black' value={parseInt(t.id)}>{t.name}</option></>
                         )
                     }</select>
-                <p>{state.message}</p>
+                <p className="text-red-500">{state.message}</p>
                 <button type="submit">Add</button>
             </form>
         </div>
