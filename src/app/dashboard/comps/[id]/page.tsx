@@ -1,5 +1,6 @@
 import { AddGroup } from '@/app/actions/actions'
 import AddTeamForm from '@/app/components/AddTeamForm'
+import AddToGroupFrom from '@/app/components/AddToGroupFrom'
 import AssignGroupForm from '@/app/components/AssignGroupForm'
 import Group from '@/app/components/Group'
 import Team from '@/app/components/Team'
@@ -38,7 +39,6 @@ export default async function page({ params, searchParams }: { params: { id: num
     const allTeams = await db.query.teams.findMany(
         { orderBy: [asc(teams.name)] }
     );
-    const AddGroupWithId = AddGroup.bind(null, params.id)
     return (
         <div>
             <h1>{searchParams.formalName} {searchParams.type}</h1>
@@ -65,11 +65,7 @@ export default async function page({ params, searchParams }: { params: { id: num
                         </div>
                     ))
                 )}
-                <form action={AddGroupWithId}>
-                    <label htmlFor="group" />
-                    <input className='text-black' type="text" name='group' />
-                    <button type="submit">Add</button>
-                </form>
+                <AddToGroupFrom id={params.id} />
             </div>
         </div>
     )
