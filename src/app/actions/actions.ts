@@ -1,7 +1,7 @@
 "use server"
 
 import db from "@/db"
-import { competitions, groupTeams, groups, teams, teamsCompetitions } from "@/db/schema"
+import { competitions, fixtures, groupTeams, groups, teams, teamsCompetitions } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
@@ -42,6 +42,19 @@ const groupTeamSchema = z.object({
 const teamsCompetitionsSchema = z.object({
     teamId: z.coerce.number().min(1),
     competitionId: z.coerce.number().min(1),
+})
+
+const fixtureSchema = z.object({
+    id: z.number().min(1),
+    competitionId: z.coerce.number().min(1),
+    homeTeamId: z.coerce.number().min(1),
+    awayTeamId: z.coerce.number().min(1),
+    date: z.coerce.date(),
+    venue: z.string().min(1),
+    status: z.string().min(1),
+    homeTeamScore: z.nullable(z.number().min(1)),
+    awayTeamScore: z.nullable(z.number().min(1)),
+    matchday: z.coerce.number().min(1),
 })
 
 export async function SubmitComp(formData: FormData) {
@@ -249,7 +262,7 @@ export async function SubmitTeamToGroup(teamId: any, formData: FormData) {
 
 export async function AddTeamToComp(competitionId: number, prevState: any, formData: FormData,) {
     try {
-
+        console.log(competitionId)
         const teamsComp = teamsCompetitionsSchema.safeParse({
             teamId: formData.get("id"),
             competitionId: competitionId
@@ -263,7 +276,9 @@ export async function AddTeamToComp(competitionId: number, prevState: any, formD
         }
 
         const exists = await db.select().from(teamsCompetitions)
-            .where(eq(teamsCompetitions.teamId, teamsComp.data.teamId))
+            .where(and(
+                eq(teamsCompetitions.teamId, teamsComp.data.teamId),
+                eq(teamsCompetitions.competitionId, teamsComp.data.competitionId)))
 
         if (exists.length == 0) {
             await db.insert(teamsCompetitions).values(teamsComp.data)
@@ -369,6 +384,99 @@ export async function AddGroup(id: number, formData: FormData) {
         return {
             type: "error",
             message: "Error adding group: " + error
+        };
+    }
+}
+
+export async function AddFixture(compId: number, formData: FormData) {
+    try {
+        console.log(formData)
+        console.log(compId)
+        const fixturePartialSchema = fixtureSchema.pick({
+            competitionId: true,
+            homeTeamId: true,
+            awayTeamId: true,
+            date: true,
+            venue: true,
+            homeTeamScore: true,
+            awayTeamScore: true,
+            matchday: true
+        });
+
+        const fixture = fixturePartialSchema.safeParse({
+            competitionId: compId,
+            homeTeamId: formData.get("homeTeamId"),
+            awayTeamId: formData.get("awayTeamId"),
+            date: formData.get("date"),
+            venue: formData.get("venue"),
+            status: formData.get("status"),
+            homeTeamScore: formData.get("homeTeamScore"),
+            awayTeamScore: formData.get("awayTeamScore"),
+            matchday: formData.get("matchday")
+        });
+
+        if (!fixture.success) {
+            console.log(fixture.error.message);
+            return {
+                type: "error",
+                message: fixture.error.message
+            }
+        }
+
+        await db.insert(fixtures).values(
+            fixture.data
+        )
+
+        revalidatePath("/");
+
+        return {
+            type: "success",
+            message: "Fixture added"
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            type: "error",
+            message: "Error adding fixture: " + error
+        };
+    }
+}
+
+export async function DeleteFixture(fixtureId: number, competitionId: number) {
+    try {
+        const fixture = fixtureSchema.pick({
+            id: true
+        }).safeParse({
+            id: fixtureId,
+            competitionId: competitionId
+        });
+
+        if (!fixture.success) {
+            console.log(fixture.error.message);
+            return {
+                type: "error",
+                message: fixture.error.message
+            }
+        }
+
+        await db.delete(fixtures).where(
+            and(
+                eq(fixtures.id, fixture.data.id),
+                eq(fixtures.competitionId, competitionId)
+            )
+        );
+
+        revalidatePath("/");
+
+        return {
+            type: "success",
+            message: "Fixture deleted"
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            type: "error",
+            message: "Error deleting fixture: " + error
         };
     }
 }

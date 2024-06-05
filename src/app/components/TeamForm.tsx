@@ -7,11 +7,7 @@ export default function
 
     return (
         <div>
-            <form className="flex flex-col gap-2"
-                action={async (formData) => {
-                    await SubmitTeam(formData)
-                }}
-            >
+            <form className="flex flex-col gap-2" action={SubmitTeam}>
                 <label htmlFor="name">Name</label>
                 <input className="text-black" type="text" name="name" />
                 <label htmlFor="shortName">Short Name</label>

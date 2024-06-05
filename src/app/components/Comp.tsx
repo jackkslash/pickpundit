@@ -19,12 +19,13 @@ const Comp = ({ competition }: { competition: any }) => {
                 <p>Code: {competition.code}</p>
                 <p>Type: {competition.type}</p>
                 <br />
-                <div className='flex gap-2'>
+                <div className='flex gap-6'>
+                    <Link href={`/dashboard/comps/${competition.id}/fixtures`}>Fixtures</Link>
                     <Link href={`/dashboard/comps/` + competition.id + `?formalName=` + competition.formalName + '&type=' + competition.type}>Edit</Link>
-                    <br />
                     <form action={deleteCompWithId}>
                         <button type="submit">Delete</button>
                     </form>
+
                 </div>
 
             </div>}

@@ -1,6 +1,6 @@
 import { AddGroup } from "../actions/actions"
 
-export default function AddToGroupFrom({ id }: { id: number }) {
+export default function AddGroupFrom({ id }: { id: number }) {
 
     const AddGroupWithId = AddGroup.bind(null, id)
 

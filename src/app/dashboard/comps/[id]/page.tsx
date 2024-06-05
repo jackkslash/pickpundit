@@ -1,6 +1,5 @@
-import { AddGroup } from '@/app/actions/actions'
 import AddTeamForm from '@/app/components/AddTeamForm'
-import AddToGroupFrom from '@/app/components/AddToGroupFrom'
+import AddGroupFrom from '@/app/components/AddGroupFrom'
 import AssignGroupForm from '@/app/components/AssignGroupForm'
 import Group from '@/app/components/Group'
 import Team from '@/app/components/Team'
@@ -8,6 +7,7 @@ import db from '@/db'
 import { competitions, teamsCompetitions, teams, groups, groupTeams } from '@/db/schema'
 import { and, asc, eq } from 'drizzle-orm'
 import React from 'react'
+import Link from 'next/link'
 
 export default async function page({ params, searchParams }: { params: { id: number }, searchParams: { formalName: string, type: string } }) {
 
@@ -57,16 +57,24 @@ export default async function page({ params, searchParams }: { params: { id: num
             <AddTeamForm allTeams={allTeams} competitionId={params.id} />
             <br />
             <div>
-                <h2>Groups</h2>
-                {searchParams.type === "CUP" && (
-                    allGroups.map((g: any) => (
-                        <div key={g.id}>
-                            <Group id={params.id} g={g} />
-                        </div>
-                    ))
-                )}
-                <AddToGroupFrom id={params.id} />
+                {searchParams.type === "CUP" &&
+                    <div>
+                        <h2>Groups</h2>
+                        {
+                            allGroups.map((g: any) => (
+                                <div key={g.id}>
+                                    <Group id={params.id} g={g} />
+                                </div>
+                            ))
+                        }
+                        <AddGroupFrom id={params.id} />
+                    </div>
+                }
             </div>
+            <br />
+            <Link href={`/dashboard/comps/${params.id}/fixtures`}>
+                <p>See Fixture List</p>
+            </Link>
         </div>
     )
 }

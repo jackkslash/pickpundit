@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm"
 import {
     timestamp,
     pgTable,
@@ -112,3 +113,17 @@ export const groupTeams = pgTable("groupTeam", {
         .notNull()
         .references(() => teams.id, { onDelete: "cascade" }),
 })
+
+export const fixtures = pgTable("fixture", {
+    id: serial("id").primaryKey(),
+    competitionId: integer("competitionId").notNull().references(() => competitions.id, { onDelete: "cascade" }),
+    homeTeamId: integer("homeTeamId").notNull().references(() => teams.id, { onDelete: "cascade" }),
+    awayTeamId: integer("awayTeamId").notNull().references(() => teams.id, { onDelete: "cascade" }),
+    date: timestamp("date", { mode: "date" }).notNull(),
+    venue: text("venue").notNull(),
+    status: text("status").notNull().default("scheduled"),
+    homeTeamScore: integer("homeTeamScore"),
+    awayTeamScore: integer("awayTeamScore"),
+    matchday: integer("matchday"),
+    round: text("round")
+});
