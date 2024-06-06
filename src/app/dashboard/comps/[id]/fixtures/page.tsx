@@ -1,10 +1,9 @@
 import AddFixtureForm from "@/app/components/AddFixtureForm"
 import Fixture from "@/app/components/Fixture"
+import Fixtures from "@/app/components/Fixtures"
 import db from "@/db"
 import { competitions, fixtures, groupTeams, groups, teams, teamsCompetitions } from "@/db/schema"
-import { match } from "assert"
-import { group } from "console"
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { alias } from "drizzle-orm/pg-core"
 
 export default async function page({ params }: { params: { id: number } }) {
@@ -58,18 +57,22 @@ export default async function page({ params }: { params: { id: number } }) {
         .leftJoin(homeTeamAlias, eq(homeTeamAlias.id, fixtures.homeTeamId))
         .leftJoin(awayTeamAlias, eq(awayTeamAlias.id, fixtures.awayTeamId))
         .where(eq(fixtures.competitionId, params.id))
+        .orderBy(fixtures.matchday);
 
     console.log(dataComp)
     console.log(dataTeams)
     console.log(fixturesData)
+
+
     return (
         <div className="flex flex-col items-center justify-center gap-6">
             <h2 className="">{dataComp[0].formalName}</h2>
-            {
+            {/* {
                 fixturesData.map((f: any) => (
                     <Fixture fixture={f} />
                 ))
-            }
+            } */}
+            <Fixtures fixtures={fixturesData} />
             <AddFixtureForm teams={dataTeams} comp={dataComp[0]} />
         </div>
     )
