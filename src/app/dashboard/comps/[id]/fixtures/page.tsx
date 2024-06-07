@@ -44,8 +44,10 @@ export default async function page({ params }: { params: { id: number } }) {
         date: fixtures.date,
         homeTeamId: fixtures.homeTeamId,
         homeTeam: homeTeamAlias.name,
+        homeTla: homeTeamAlias.tla,
         awayTeam: awayTeamAlias.name,
         awayTeamId: fixtures.awayTeamId,
+        awayTla: awayTeamAlias.tla,
         homeTeamScore: fixtures.homeTeamScore,
         awayTeamScore: fixtures.awayTeamScore,
         status: fixtures.status,
@@ -67,11 +69,6 @@ export default async function page({ params }: { params: { id: number } }) {
     return (
         <div className="flex flex-col items-center justify-center gap-6">
             <h2 className="">{dataComp[0].formalName}</h2>
-            {/* {
-                fixturesData.map((f: any) => (
-                    <Fixture fixture={f} />
-                ))
-            } */}
             <Fixtures fixtures={fixturesData} />
             <AddFixtureForm teams={dataTeams} comp={dataComp[0]} />
         </div>

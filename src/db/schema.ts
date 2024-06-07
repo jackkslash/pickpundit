@@ -122,8 +122,8 @@ export const fixtures = pgTable("fixture", {
     date: timestamp("date", { mode: "date" }).notNull(),
     venue: text("venue").notNull(),
     status: text("status").notNull().default("scheduled"),
-    homeTeamScore: integer("homeTeamScore"),
-    awayTeamScore: integer("awayTeamScore"),
+    homeTeamScore: integer("homeTeamScore").default(0).notNull(),
+    awayTeamScore: integer("awayTeamScore").default(0).notNull(),
     matchday: integer("matchday"),
     round: text("round")
 });

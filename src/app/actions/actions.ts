@@ -52,8 +52,8 @@ const fixtureSchema = z.object({
     date: z.coerce.date(),
     venue: z.string().min(1),
     status: z.string().min(1),
-    homeTeamScore: z.nullable(z.number().min(1)),
-    awayTeamScore: z.nullable(z.number().min(1)),
+    homeTeamScore: z.coerce.number().min(0),
+    awayTeamScore: z.coerce.number().min(0),
     matchday: z.coerce.number().min(1),
 })
 
@@ -477,6 +477,48 @@ export async function DeleteFixture(fixtureId: number, competitionId: number) {
         return {
             type: "error",
             message: "Error deleting fixture: " + error
+        };
+    }
+}
+
+export async function UpdateFixtureScores(fixtureId: number, homeTeamScore: number, awayTeamScore: number) {
+    try {
+        const fixture = fixtureSchema.pick({
+            id: true,
+            homeTeamScore: true,
+            awayTeamScore: true
+        }).safeParse({
+            id: fixtureId,
+            homeTeamScore: homeTeamScore,
+            awayTeamScore: awayTeamScore
+        });
+
+        if (!fixture.success) {
+            console.log(fixture.error.message);
+            return {
+                type: "error",
+                message: fixture.error.message
+            }
+        }
+
+        await db.update(fixtures).set({
+            homeTeamScore: fixture.data.homeTeamScore,
+            awayTeamScore: fixture.data.awayTeamScore
+        }).where(
+            eq(fixtures.id, fixture.data.id)
+        );
+
+        revalidatePath("/");
+
+        return {
+            type: "success",
+            message: "Fixture scores updated"
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            type: "error",
+            message: "Error updating fixture scores: " + error
         };
     }
 }
