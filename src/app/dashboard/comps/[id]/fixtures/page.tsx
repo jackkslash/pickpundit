@@ -1,5 +1,4 @@
 import AddFixtureForm from "@/app/components/AddFixtureForm"
-import Fixture from "@/app/components/Fixture"
 import Fixtures from "@/app/components/Fixtures"
 import db from "@/db"
 import { competitions, fixtures, groupTeams, groups, teams, teamsCompetitions } from "@/db/schema"
