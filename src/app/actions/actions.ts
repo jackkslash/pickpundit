@@ -3,6 +3,7 @@
 import db from "@/db"
 import { competitions, fixtures, groupTeams, groups, teams, teamsCompetitions } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
+import { stat } from "fs"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -481,16 +482,18 @@ export async function DeleteFixture(fixtureId: number, competitionId: number) {
     }
 }
 
-export async function UpdateFixtureScores(fixtureId: number, homeTeamScore: number, awayTeamScore: number) {
+export async function UpdateFixture(fixtureId: number, homeTeamScore: number, awayTeamScore: number, status: string) {
     try {
         const fixture = fixtureSchema.pick({
             id: true,
             homeTeamScore: true,
-            awayTeamScore: true
+            awayTeamScore: true,
+            status: true
         }).safeParse({
             id: fixtureId,
             homeTeamScore: homeTeamScore,
-            awayTeamScore: awayTeamScore
+            awayTeamScore: awayTeamScore,
+            status: status
         });
 
         if (!fixture.success) {
@@ -503,7 +506,8 @@ export async function UpdateFixtureScores(fixtureId: number, homeTeamScore: numb
 
         await db.update(fixtures).set({
             homeTeamScore: fixture.data.homeTeamScore,
-            awayTeamScore: fixture.data.awayTeamScore
+            awayTeamScore: fixture.data.awayTeamScore,
+            status: fixture.data.status
         }).where(
             eq(fixtures.id, fixture.data.id)
         );
@@ -512,7 +516,7 @@ export async function UpdateFixtureScores(fixtureId: number, homeTeamScore: numb
 
         return {
             type: "success",
-            message: "Fixture scores updated"
+            message: "Fixture updated"
         };
     } catch (error) {
         console.log(error);

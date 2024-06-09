@@ -1,27 +1,24 @@
 'use client'
 import { useState } from "react";
-import { DeleteFixture, UpdateFixtureScores } from "../actions/actions";
+import { DeleteFixture, UpdateFixture } from "../actions/actions";
 
 export default function Fixture({ fixture }: { fixture: any }) {
     const [isEditing, setIsEditing] = useState(false);
     const [homeTeamScore, setHomeTeamScore] = useState(fixture.homeTeamScore);
     const [awayTeamScore, setAwayTeamScore] = useState(fixture.awayTeamScore);
+    const [matchStatus, setMatchStatus] = useState(fixture.status);
 
     const DeleteFixtureWithIds = DeleteFixture.bind(null, fixture.id, fixture.competitionId);
+    const UpdateFixtureWithIds = UpdateFixture.bind(null, fixture.id, homeTeamScore, awayTeamScore, matchStatus);
     const event = new Date(fixture.date);
 
     const toggleEdit = () => {
         if (isEditing) {
-            handleSave(homeTeamScore, awayTeamScore, fixture.id);
+            UpdateFixtureWithIds();
         }
         setIsEditing(!isEditing);
     };
 
-    console.log("fixture", fixture.id);
-    const handleSave = (homeTeamScore: number, awayTeamScore: number, fixtureId: number) => {
-        UpdateFixtureScores(fixtureId, homeTeamScore, awayTeamScore);
-        console.log('Saving scores', { homeTeamScore, awayTeamScore });
-    };
     return (
         <div className="flex flex-col items-center justify-center">
             <div className="flex flex-col justify-center w-full h-full">
@@ -53,8 +50,14 @@ export default function Fixture({ fixture }: { fixture: any }) {
                 </p>
                 <p>{event.toLocaleDateString()} at {event.toLocaleTimeString()}</p>
                 <p>{fixture.venue}</p>
-                <p>{fixture.status}</p>
                 <p>{fixture.round}</p>
+                <p>{isEditing ? <select className="text-black" name="matchStatus" value={matchStatus} onChange={(e) => setMatchStatus(e.target.value)}>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="inprogress">In Progress</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="finished">Finished</option>
+                </select> : matchStatus}</p>
             </div>
 
             <div className="flex">
