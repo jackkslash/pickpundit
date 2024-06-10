@@ -56,6 +56,7 @@ const fixtureSchema = z.object({
     homeTeamScore: z.coerce.number().min(0),
     awayTeamScore: z.coerce.number().min(0),
     matchday: z.coerce.number().min(1),
+    round: z.string().min(0),
 })
 
 export async function SubmitComp(formData: FormData) {
@@ -401,7 +402,8 @@ export async function AddFixture(compId: number, formData: FormData) {
             venue: true,
             homeTeamScore: true,
             awayTeamScore: true,
-            matchday: true
+            matchday: true,
+            round: true
         });
 
         const fixture = fixturePartialSchema.safeParse({
@@ -410,10 +412,10 @@ export async function AddFixture(compId: number, formData: FormData) {
             awayTeamId: formData.get("awayTeamId"),
             date: formData.get("date"),
             venue: formData.get("venue"),
-            status: formData.get("status"),
             homeTeamScore: formData.get("homeTeamScore"),
             awayTeamScore: formData.get("awayTeamScore"),
-            matchday: formData.get("matchday")
+            matchday: formData.get("matchday"),
+            round: formData.get("round")
         });
 
         if (!fixture.success) {

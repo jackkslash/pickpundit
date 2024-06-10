@@ -21,9 +21,6 @@ export default async function Home() {
                     <button type="submit">Sign Out</button>
                 </form>
             </div>
-            <pre>
-                {JSON.stringify(session, null, 2)}
-            </pre>
         </main>
     );
 }
