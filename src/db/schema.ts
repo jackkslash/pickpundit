@@ -6,6 +6,7 @@ import {
     primaryKey,
     integer,
     serial,
+    boolean,
 } from "drizzle-orm/pg-core"
 import { AdapterAccountType } from "next-auth/adapters"
 
@@ -72,6 +73,7 @@ export const competitions = pgTable("competition", {
     code: text("code").notNull(),
     type: text("type").notNull(),
     emblem: text("emblem"),
+    active: boolean("active").notNull().default(false),
 })
 
 export const teams = pgTable("team", {
