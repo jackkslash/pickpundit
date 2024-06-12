@@ -7,6 +7,8 @@ export default async function NavBar() {
             <a href="/">Home</a>
             {session != null ? (
                 <div className='flex flex-row items-center justify-center space-x-4'>
+                    <a href="/competitions">Competitions</a>
+                    <a href="/teams">Teams</a>
                     <a href="/me">Me</a>
                     {session?.user.role == "admin" ? (
                         <a href="/dashboard">Dashboard</a>

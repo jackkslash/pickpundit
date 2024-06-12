@@ -1,27 +1,27 @@
+import { auth } from "@/auth";
 import db from "@/db";
-import { competitions, fixtures, teams } from "@/db/schema";
-import { max, sql, eq, gt } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
-import Link from "next/link";
+import { competitions } from "@/db/schema";
+import Competions from "./components/Competitions";
 
 export default async function Home() {
+  const session = await auth();
 
   const dataComps = await db.select().from(competitions)
-    .where(eq(competitions.active, true))
     .orderBy(competitions.id)
+
+  const dataCompsFiltered = dataComps.filter((comp: any) => comp.active == true)
+
+  if (session?.user.role == "admin") {
+    return (
+      <main className="flex flex-col justify-between p-24">
+        <Competions comps={dataComps} />
+      </main>
+    );
+  }
 
   return (
     <main className="flex flex-col justify-between p-24">
-      {dataComps.map((comp: any) => (
-        <div key={comp.id}>
-          <Link href={`/${comp.id}`}>{comp.formalName}</Link>
-          <h2>{comp.informalName}</h2>
-          <p>{comp.code}</p>
-          <p>{comp.type}</p>
-          <p>{comp.emblem}</p>
-          <p>{comp.currentMatchday}</p>
-        </div>
-      ))}
+      <Competions comps={dataCompsFiltered} />
     </main>
   );
 }
