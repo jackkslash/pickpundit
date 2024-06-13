@@ -9,8 +9,9 @@ import { and, asc, eq } from 'drizzle-orm'
 import React from 'react'
 import Link from 'next/link'
 
-export default async function page({ params, searchParams }: { params: { id: number }, searchParams: { formalName: string, type: string } }) {
-
+export default async function page({ params, searchParams }: { params: { compId: number }, searchParams: { formalName: string, type: string } }) {
+    console.log(searchParams)
+    console.log(params)
     const comp = await db.select({
         id: teams.id,
         name: teams.name,
@@ -33,19 +34,24 @@ export default async function page({ params, searchParams }: { params: { id: num
                 eq(groupTeams.groupId, groups.id),
                 eq(competitions.id, groups.competitionId))
         )
-        .where(eq(competitions.id, params.id))
+        .where(eq(competitions.id, params.compId))
 
-    const allGroups = await db.select().from(groups).where(eq(groups.competitionId, params.id))
+    console.log("comp", comp)
+    const allGroups = await db.select().from(groups).where(eq(groups.competitionId, params.compId))
     const allTeams = await db.query.teams.findMany(
         { orderBy: [asc(teams.name)] }
     );
+
+    console.log("allTeams", allTeams)
+    console.log("allGroups", allGroups)
+
     return (
         <div>
             <h1>{searchParams.formalName} {searchParams.type}</h1>
             <h2>Teams</h2>
             {comp.map((c: any) =>
                 <div>
-                    <Team team={c} competitionId={params.id}>
+                    <Team team={c} competitionId={params.compId}>
                         {searchParams.type === "CUP" &&
                             c.id != null &&
                             c.group == null &&
@@ -54,7 +60,7 @@ export default async function page({ params, searchParams }: { params: { id: num
                     </Team>
                 </div>)}
             <br />
-            <AddTeamForm allTeams={allTeams} competitionId={params.id} />
+            <AddTeamForm allTeams={allTeams} competitionId={params.compId} />
             <br />
             <div>
                 {searchParams.type === "CUP" &&
@@ -63,16 +69,16 @@ export default async function page({ params, searchParams }: { params: { id: num
                         {
                             allGroups.map((g: any) => (
                                 <div key={g.id}>
-                                    <Group id={params.id} g={g} />
+                                    <Group id={params.compId} g={g} />
                                 </div>
                             ))
                         }
-                        <AddGroupFrom id={params.id} />
+                        <AddGroupFrom id={params.compId} />
                     </div>
                 }
             </div>
             <br />
-            <Link href={`/dashboard/comps/${params.id}/fixtures`}>
+            <Link href={`/competitions/${params.compId}/fixtures`}>
                 <p>See Fixture List</p>
             </Link>
         </div>

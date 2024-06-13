@@ -10,11 +10,6 @@ export default async function NavBar() {
                     <a href="/competitions">Competitions</a>
                     <a href="/teams">Teams</a>
                     <a href="/me">Me</a>
-                    {session?.user.role == "admin" ? (
-                        <a href="/dashboard">Dashboard</a>
-                    ) : (
-                        null
-                    )}
                     <form
                         action={async () => {
                             "use server";

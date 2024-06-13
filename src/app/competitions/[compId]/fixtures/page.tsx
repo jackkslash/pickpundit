@@ -5,11 +5,11 @@ import { competitions, fixtures, groupTeams, groups, teams, teamsCompetitions } 
 import { eq } from "drizzle-orm"
 import { alias } from "drizzle-orm/pg-core"
 
-export default async function page({ params }: { params: { id: number } }) {
+export default async function page({ params }: { params: { compId: number } }) {
 
     const dataComp = await db.select()
         .from(competitions)
-        .where(eq(competitions.id, params.id))
+        .where(eq(competitions.id, params.compId))
 
     const dataTeams = await db.select({
         id: teams.id,
@@ -32,7 +32,7 @@ export default async function page({ params }: { params: { id: number } }) {
         .innerJoin(competitions,
             eq(competitions.id, teamsCompetitions.competitionId)
         )
-        .where(eq(teamsCompetitions.competitionId, params.id))
+        .where(eq(teamsCompetitions.competitionId, params.compId))
 
 
     const homeTeamAlias = alias(teams, 'homeTeam');
@@ -57,7 +57,7 @@ export default async function page({ params }: { params: { id: number } }) {
     }).from(fixtures)
         .leftJoin(homeTeamAlias, eq(homeTeamAlias.id, fixtures.homeTeamId))
         .leftJoin(awayTeamAlias, eq(awayTeamAlias.id, fixtures.awayTeamId))
-        .where(eq(fixtures.competitionId, params.id))
+        .where(eq(fixtures.competitionId, params.compId))
         .orderBy(fixtures.matchday);
 
     console.log(dataComp)
