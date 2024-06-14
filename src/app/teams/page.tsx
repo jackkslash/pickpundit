@@ -13,7 +13,7 @@ export default async function TeamPage() {
             <div className='flex flex-col gap-4'>
                 <h1>Teams</h1>
                 {dataTeams.map((team: any) => (
-                    <Team team={team} />
+                    <Team team={team} role={session?.user?.role} />
                 ))}
             </div>
             <br />

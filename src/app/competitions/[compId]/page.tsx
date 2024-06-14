@@ -8,10 +8,12 @@ import { competitions, teamsCompetitions, teams, groups, groupTeams } from '@/db
 import { and, asc, eq } from 'drizzle-orm'
 import React from 'react'
 import Link from 'next/link'
+import { auth } from '@/auth'
 
 export default async function page({ params, searchParams }: { params: { compId: number }, searchParams: { formalName: string, type: string } }) {
     console.log(searchParams)
     console.log(params)
+    const session = await auth();
     const comp = await db.select({
         id: teams.id,
         name: teams.name,
@@ -60,7 +62,8 @@ export default async function page({ params, searchParams }: { params: { compId:
                     </Team>
                 </div>)}
             <br />
-            <AddTeamForm allTeams={allTeams} competitionId={params.compId} />
+            {session?.user.role === "admin" &&
+                <AddTeamForm allTeams={allTeams} competitionId={params.compId} />}
             <br />
             <div>
                 {searchParams.type === "CUP" &&
@@ -73,7 +76,8 @@ export default async function page({ params, searchParams }: { params: { compId:
                                 </div>
                             ))
                         }
-                        <AddGroupFrom id={params.compId} />
+                        {session?.user.role === "admin" &&
+                            <AddGroupFrom id={params.compId} />}
                     </div>
                 }
             </div>
