@@ -1,4 +1,8 @@
 import { auth, signIn, signOut } from '@/auth';
+import db from '@/db';
+import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 
 export default async function NavBar() {
     const session = await auth();
@@ -10,6 +14,23 @@ export default async function NavBar() {
                     <a href="/competitions">Competitions</a>
                     <a href="/teams">Teams</a>
                     <a href="/me">Me</a>
+                    // debug button for roles
+                    <form
+                        action={async () => {
+                            "use server";
+                            let userRole = session.user.role;
+                            userRole = (userRole === "admin") ? "user" : "admin";
+
+                            await db.update(users)
+                                .set({ role: userRole })
+                                .where(eq(users.id, session.user.id as string))
+                            revalidatePath('/')
+                        }}
+
+                    >
+                        <button type="submit">Switch Role</button>
+                    </form>
+
                     <form
                         action={async () => {
                             "use server";

@@ -6,7 +6,6 @@ export default function Fixtures({ fixtures }: { fixtures: any }) {
     const [matchday, setMatchday] = useState('1');
     return (
         <div className="flex flex-col items-center justify-center gap-6">
-
             <select onChange={(e) => setMatchday(e.target.value)} className="text-black" value={matchday}>
                 <option value="">All</option>
                 <option value="1">1</option>

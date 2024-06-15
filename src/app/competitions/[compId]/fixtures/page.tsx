@@ -1,5 +1,6 @@
 import AddFixtureForm from "@/app/components/AddFixtureForm"
 import Fixtures from "@/app/components/Fixtures"
+import { auth } from "@/auth"
 import db from "@/db"
 import { competitions, fixtures, groupTeams, groups, teams, teamsCompetitions } from "@/db/schema"
 import { eq } from "drizzle-orm"
@@ -7,6 +8,7 @@ import { alias } from "drizzle-orm/pg-core"
 
 export default async function page({ params }: { params: { compId: number } }) {
 
+    const session = await auth();
     const dataComp = await db.select()
         .from(competitions)
         .where(eq(competitions.id, params.compId))
@@ -69,7 +71,8 @@ export default async function page({ params }: { params: { compId: number } }) {
         <div className="flex flex-col items-center justify-center gap-6">
             <h2 className="">{dataComp[0].formalName}</h2>
             <Fixtures fixtures={fixturesData} />
-            <AddFixtureForm teams={dataTeams} comp={dataComp[0]} />
+            {session?.user.role === "admin" &&
+                <AddFixtureForm teams={dataTeams} comp={dataComp[0]} />}
         </div>
     )
 }
