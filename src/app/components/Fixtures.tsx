@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Fixture from "./Fixture";
 
-export default function Fixtures({ fixtures }: { fixtures: any }) {
+export default function Fixtures({ fixtures, role }: { fixtures: any, role?: string }) {
     const [matchday, setMatchday] = useState('1');
     return (
         <div className="flex flex-col items-center justify-center gap-6">
@@ -17,7 +17,7 @@ export default function Fixtures({ fixtures }: { fixtures: any }) {
                         fixture.matchday.toString().includes(matchday.toLowerCase())
                     )
                     .map((f: any) => (
-                        <Fixture key={f.id} fixture={f} />
+                        <Fixture key={f.id} fixture={f} role={role} />
                     ))
             }
         </div>

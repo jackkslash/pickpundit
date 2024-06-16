@@ -70,7 +70,7 @@ export default async function page({ params }: { params: { compId: number } }) {
     return (
         <div className="flex flex-col items-center justify-center gap-6">
             <h2 className="">{dataComp[0].formalName}</h2>
-            <Fixtures fixtures={fixturesData} />
+            <Fixtures fixtures={fixturesData} role={session?.user.role} />
             {session?.user.role === "admin" &&
                 <AddFixtureForm teams={dataTeams} comp={dataComp[0]} />}
         </div>

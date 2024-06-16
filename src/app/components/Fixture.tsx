@@ -1,8 +1,8 @@
 'use client'
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { DeleteFixture, UpdateFixture } from "../actions/actions";
 
-export default function Fixture({ fixture }: { fixture: any }) {
+export default function Fixture({ fixture, role }: { fixture: any, role?: string }) {
     const [isEditing, setIsEditing] = useState(false);
     const [homeTeamScore, setHomeTeamScore] = useState(fixture.homeTeamScore);
     const [awayTeamScore, setAwayTeamScore] = useState(fixture.awayTeamScore);
@@ -12,6 +12,7 @@ export default function Fixture({ fixture }: { fixture: any }) {
     const UpdateFixtureWithIds = UpdateFixture.bind(null, fixture.id, homeTeamScore, awayTeamScore, matchStatus);
     const event = new Date(fixture.date);
 
+
     const toggleEdit = () => {
         if (isEditing) {
             UpdateFixtureWithIds();
@@ -19,6 +20,11 @@ export default function Fixture({ fixture }: { fixture: any }) {
         setIsEditing(!isEditing);
     };
 
+    useEffect(() => {
+        if (role === "admin") {
+            setIsEditing(false);
+        }
+    }, [role])
     return (
         <div className="flex flex-col items-center justify-center">
             <div className="flex flex-col justify-center w-full h-full">
@@ -59,15 +65,15 @@ export default function Fixture({ fixture }: { fixture: any }) {
                     <option value="finished">Finished</option>
                 </select> : matchStatus}</p>
             </div>
-
-            <div className="flex">
-                <button onClick={toggleEdit}>
-                    {isEditing ? 'Save Score' : 'Edit Score'}
-                </button>
-                <form action={DeleteFixtureWithIds} className="ml-2">
-                    <button type="submit">Delete</button>
-                </form>
-            </div>
+            {role === "admin" &&
+                <div className="flex">
+                    <button onClick={toggleEdit}>
+                        {isEditing ? 'Save Score' : 'Edit Score'}
+                    </button>
+                    <form action={DeleteFixtureWithIds} className="ml-2">
+                        <button type="submit">Delete</button>
+                    </form>
+                </div>}
         </div>
     );
 }

@@ -14,7 +14,6 @@ export default async function NavBar() {
                     <a href="/competitions">Competitions</a>
                     <a href="/teams">Teams</a>
                     <a href="/me">Me</a>
-                    // debug button for roles
                     <form
                         action={async () => {
                             "use server";
