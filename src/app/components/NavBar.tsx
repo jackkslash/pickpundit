@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 export default async function NavBar() {
     const session = await auth();
     return (
-        <nav className='flex h-full justify-between items-center space-x-4'>
+        <nav className='flex h-full justify-between items-center space-x-4 font-ceefaxBulletin uppercase'>
             <a href="/">Home</a>
             {session != null ? (
                 <div className='flex flex-row items-center justify-center space-x-4'>
@@ -27,7 +27,7 @@ export default async function NavBar() {
                         }}
 
                     >
-                        <button type="submit">Switch Role</button>
+                        <button type="submit" className='uppercase'>Switch Role</button>
                     </form>
 
                     <form
@@ -36,7 +36,7 @@ export default async function NavBar() {
                             await signOut();
                         }}
                     >
-                        <button type="submit">Sign Out</button>
+                        <button type="submit" className='uppercase'>Sign Out</button>
                     </form>
 
                 </div>

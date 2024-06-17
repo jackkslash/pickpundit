@@ -4,7 +4,7 @@ import Comp from './Comp'
 function Competions({ comps }: { comps: any }) {
     return (
         <div className='flex flex-col gap-4'>
-            <h1>Competitions</h1>
+            <h1 className='text-2xl font-ceefaxBulletin uppercase'>Competitions</h1>
             {comps.map((competition: any) => (
                 <div className='flex gap-2'>
                     <Comp competition={competition} />

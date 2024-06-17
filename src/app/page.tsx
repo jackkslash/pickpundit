@@ -13,7 +13,7 @@ export default async function Home() {
 
   if (session?.user.role == "admin") {
     return (
-      <main className="flex flex-col justify-between p-24">
+      <main className="flex flex-col justify-between p-24 font-ceefax ">
         <Competions comps={dataComps} />
       </main>
     );

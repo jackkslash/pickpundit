@@ -13,6 +13,10 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      fontFamily: {
+        ceefax: ['var(--font-ceefax)'],
+        ceefaxBulletin: ['var(--font-ceefax-bulletin)'],
+      },
     },
   },
   plugins: [],
