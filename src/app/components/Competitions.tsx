@@ -1,12 +1,12 @@
 import React from 'react'
 import Comp from './Comp'
 
-function Competions({ comps }: { comps: any }) {
+function Competitions({ comps }: { comps: any }) {
     return (
         <div className='flex flex-col gap-4'>
-            <h1 className='text-2xl font-ceefaxBulletin uppercase'>Competitions</h1>
+            <h1 className='flex items-center justify-center text-4xl font-ceefaxBulletin uppercase'>Competitions</h1>
             {comps.map((competition: any) => (
-                <div className='flex gap-2'>
+                <div className=' '>
                     <Comp competition={competition} />
                 </div>
             ))}
@@ -14,4 +14,4 @@ function Competions({ comps }: { comps: any }) {
     )
 }
 
-export default Competions
+export default Competitions

@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import db from "@/db";
 import { competitions } from "@/db/schema";
-import Competions from "./components/Competitions";
+import Competitions from "./components/Competitions";
 
 export default async function Home() {
   const session = await auth();
@@ -13,15 +13,15 @@ export default async function Home() {
 
   if (session?.user.role == "admin") {
     return (
-      <main className="flex flex-col justify-between p-24 font-ceefax ">
-        <Competions comps={dataComps} />
+      <main className="flex flex-col justify-between font-ceefax ">
+        <Competitions comps={dataComps} />
       </main>
     );
   }
 
   return (
-    <main className="flex flex-col justify-between p-24">
-      <Competions comps={dataCompsFiltered} />
+    <main className="flex flex-col justify-between">
+      <Competitions comps={dataCompsFiltered} />
     </main>
   );
 }
