@@ -3,32 +3,29 @@ import { DeleteComp } from "../actions/actions";
 import { auth } from "@/auth";
 
 const Comp = async ({ competition }: { competition: any }) => {
-    const session = await auth()
+    const session = await auth();
 
     const deleteCompWithId = DeleteComp.bind(null, competition.id);
     return (
-        <div>
-            <h1>{competition.formalName} ({competition.informalName})</h1>
-            <div className="text-white pt-2">
-                <p>Name: {competition.formalName}</p>
-                <p>Formal Name: {competition.informalName}</p>
-                <p>Code: {competition.code}</p>
-                <p>Type: {competition.type}</p>
-                <br />
-                <div className='flex gap-6'>
-                    <Link href={`/competitions/${competition.id}/fixtures`}>Fixtures</Link>
-                    {session?.user.role == "admin" &&
-                        <>
-                            <Link href={`/competitions/` + competition.id + `?formalName=` + competition.formalName + '&type=' + competition.type}>Edit</Link>
-                            <form action={deleteCompWithId}>
-                                <button type="submit">Delete</button>
-                            </form>
-                        </>
-                    }
-
-                </div>
-
+        <div className="flex flex-col px-4 w-full h-16 mb-6 space-y-2 mx-auto sm:w-72 ">
+            <div className='flex justify-between items-center'>
+                <h1>
+                    <Link href={`/competitions/${competition.id}/fixtures`}>
+                        {competition.formalName}
+                    </Link>
+                </h1>
+                <div>{competition.id}</div>
             </div>
+
+            {session?.user.role === "admin" && (
+                <div className="flex text-white gap-4 pb-4">
+                    <Link href={`/competitions/${competition.id}/fixtures`}>Fixtures</Link>
+                    <Link href={`/competitions/` + competition.id + `?formalName=` + competition.formalName + '&type=' + competition.type}>Edit</Link>
+                    <form action={deleteCompWithId}>
+                        <button type="submit">Delete</button>
+                    </form>
+                </div>
+            )}
         </div>
     );
 };

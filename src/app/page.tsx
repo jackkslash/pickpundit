@@ -13,14 +13,14 @@ export default async function Home() {
 
   if (session?.user.role == "admin") {
     return (
-      <main className="flex flex-col justify-between font-ceefax ">
+      <main>
         <Competitions comps={dataComps} />
       </main>
     );
   }
 
   return (
-    <main className="flex flex-col justify-between">
+    <main>
       <Competitions comps={dataCompsFiltered} />
     </main>
   );

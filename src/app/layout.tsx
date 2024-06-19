@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${ceefax.variable} ${ceefaxBulletin.variable} font-ceefax`}>
-        <header className="flex flex-col items-center justify-center space-y-4">
+        <header>
           <NavBar />
         </header>
         <main>
