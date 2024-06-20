@@ -8,11 +8,11 @@ export default async function NavBar() {
     const session = await auth();
     const debug = false;
     return (
-        <nav className='flex flex-col font-ceefaxBulletin uppercase pt-4 space-y-8 pb-4 w-full '>
-            <div className='flex flex-row items-center justify-center space-x-4 '>
-                <p className='text-[8px] sm:text-xl'>PickPundit</p>
+        <nav className='flex flex-col font-ceefaxBulletin uppercase pt-4 space-y-8 pb-4 w-full'>
+            <div className='flex flex-row items-center justify-center space-x-8 text-[8px]'>
+                <p>PickPundit</p>
                 {session != null ? (
-                    <div className='flex flex-row text-[8px] space-x-2 justify-center sm:text-xl sm:space-x-4' >
+                    <div className='flex flex-row space-x-2 justify-center sm:space-x-4' >
                         <a href="/me">Me</a>
                         {debug &&
                             <form
@@ -54,13 +54,13 @@ export default async function NavBar() {
 
                 )}
             </div>
-            <div className='flex flex-row items-center justify-center space-x-2'>
-                <a className='text-m text-black space-x-2' href="/">
+            <div className='flex flex-row items-center justify-center space-x-2 text-m '>
+                <a className=' text-black space-x-2' href="/">
                     <span className='bg-white p-4'>P</span>
                     <span className='bg-white p-4'>P</span>
                     <span className='bg-white p-4'>D</span>
                 </a>
-                <h1><span className='text-m bg-blue-500 p-4'>Football</span></h1>
+                <h1><span className=' bg-blue-500 p-4'>Football</span></h1>
             </div>
 
         </nav>
