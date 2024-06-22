@@ -1,9 +1,8 @@
 "use server"
 
 import db from "@/db"
-import { competitions, fixtures, groupTeams, groups, teams, teamsCompetitions } from "@/db/schema"
+import { competitions, fixtures, groupTeams, groups, predictions, teams, teamsCompetitions } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
-import { stat } from "fs"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -526,5 +525,40 @@ export async function UpdateFixture(fixtureId: number, homeTeamScore: number, aw
             type: "error",
             message: "Error updating fixture scores: " + error
         };
+    }
+}
+
+export async function PredictFixture(id: any, formData: FormData) {
+    try {
+        console.log(formData);
+        const predictionData: any = {}
+        formData.forEach((value, key) => {
+            const [fixtureId, score] = key.split("-")
+
+            if (!predictionData[fixtureId]) {
+                predictionData[fixtureId] = {}
+            }
+            predictionData[fixtureId][score] = Number(value)
+        })
+
+        console.log(predictionData)
+
+        const predictionArray = Object.keys(predictionData).map((fixtureId: any) => ({
+            fixtureId,
+            ...predictionData[fixtureId]
+        }))
+
+        predictionArray.map(async (prediction: any) => {
+            console.log(prediction)
+            await db.insert(predictions).values({
+                userId: id,
+                fixtureId: prediction.fixtureId,
+                predictedHomeScore: prediction.predictedHomeScore,
+                predictedAwayScore: prediction.predictedAwayScore
+            })
+        })
+        revalidatePath("/")
+    } catch (error) {
+        console.log(error);
     }
 }

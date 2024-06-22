@@ -129,3 +129,15 @@ export const fixtures = pgTable("fixture", {
     matchday: integer("matchday"),
     round: text("round")
 });
+
+export const predictions = pgTable("prediction", {
+    id: serial("id").primaryKey(),
+    userId: text("userId")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    fixtureId: integer("fixtureId")
+        .notNull()
+        .references(() => fixtures.id, { onDelete: "cascade" }),
+    predictedHomeScore: integer("predictedHomeScore").notNull(),
+    predictedAwayScore: integer("predictedAwayScore").notNull()
+});
