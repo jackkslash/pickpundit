@@ -1,4 +1,4 @@
-import { PredictFixture } from '@/app/actions/actions';
+import { PredictFixture } from '@/app/actions/fixture.action';
 import { auth } from '@/auth';
 import db from '@/db';
 import { competitions, fixtures, teams } from '@/db/schema';

@@ -1,4 +1,4 @@
-import { SubmitTeam } from "@/app/actions/actions";
+import { SubmitTeam } from "@/app/actions/team.action";
 import TeamForm from "@/app/components/TeamForm";
 import db from "@/db";
 import { teams } from "@/db/schema";

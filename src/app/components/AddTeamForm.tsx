@@ -1,6 +1,6 @@
 'use client'
 import { useFormState } from "react-dom";
-import { AddTeamToComp } from "../actions/actions";
+import { AddTeamToComp } from "../actions/competition.action";
 
 const initialState = {
     message: "",

@@ -1,5 +1,5 @@
 import React from 'react'
-import { DeleteGroup } from '../actions/actions'
+import { DeleteGroup } from '../actions/group.action'
 
 export default async function Group({ id, g }: { id: number, g: any }) {
     console.log(g)

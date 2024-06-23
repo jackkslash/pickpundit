@@ -1,4 +1,4 @@
-import { AddGroup } from "../actions/actions"
+import { AddGroup } from "../actions/group.action"
 
 export default function AddGroupFrom({ id }: { id: number }) {
 

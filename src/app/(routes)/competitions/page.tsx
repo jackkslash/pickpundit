@@ -1,4 +1,4 @@
-import { SubmitComp } from "@/app/actions/actions";
+import { SubmitComp } from "@/app/actions/competition.action";
 import Competitions from "@/app/components/Competitions";
 import CompForm from "@/app/components/CompForm";
 import { auth } from "@/auth";

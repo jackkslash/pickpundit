@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DeleteComp } from "../actions/actions";
+import { DeleteComp } from "../actions/competition.action";
 import { auth } from "@/auth";
 
 const Comp = async ({ competition }: { competition: any }) => {

@@ -1,4 +1,4 @@
-import { SubmitTeamToGroup } from "../actions/actions";
+import { SubmitTeamToGroup } from "../actions/group.action";
 
 export default function AssignGroupForm({ groupList, teamId }: { groupList: any, teamId: any }) {
     const SubmitTeamToGroupWithTeamId = SubmitTeamToGroup.bind(null, teamId)

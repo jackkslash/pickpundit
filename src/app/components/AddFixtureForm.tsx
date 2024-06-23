@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-import { AddFixture } from "../actions/actions"
+import { AddFixture } from "../actions/fixture.action"
 
 export default function AddFixtureForm({ teams, comp }: { teams: any, comp: any }) {
     const [selectedVenues, setSelectedVenues] = useState<any>([]);

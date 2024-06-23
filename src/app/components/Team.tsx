@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-import { DeleteTeam } from "../actions/actions";
+import { DeleteTeam } from "../actions/team.action";
 
 const Team = ({ team, children, competitionId, role }: { team: any, children?: any, competitionId?: any, role?: any }) => {
     const [open, setOPen] = useState(false);
