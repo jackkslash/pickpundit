@@ -1,3 +1,4 @@
+'use server'
 import db from "@/db";
 import { teams, teamsCompetitions, groupTeams } from "@/db/schema";
 import { eq, and } from "drizzle-orm";

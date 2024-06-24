@@ -1,8 +1,10 @@
+'use server'
 import db from "@/db";
 import { fixtures, predictions } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { fixtureSchema } from "../types/zod.schema";
+import { fixtureSchema, predictionFormSchema } from "../types/zod.schema";
+import { error } from "console";
 
 export async function AddFixture(compId: number, formData: FormData) {
     try {
@@ -145,10 +147,24 @@ export async function UpdateFixture(fixtureId: number, homeTeamScore: number, aw
 
 export async function PredictFixture(id: any, formData: FormData) {
     try {
+        console.log(formData)
         const predictionData: any = {}
         formData.forEach((value, key) => {
-
+            console.log("value", value)
+            console.log("key", key)
             const [fixtureId, team] = key.split("-")
+
+            const predictForm = predictionFormSchema.safeParse({
+                id: fixtureId,
+                score: value,
+                team: team
+            })
+
+
+            if (!predictForm.success) {
+                throw new Error(`Validation failed for key ${key}: ${JSON.stringify(predictForm.error.errors)}`);
+            }
+
 
             if (!predictionData[fixtureId]) {
                 predictionData[fixtureId] = {}
@@ -161,7 +177,6 @@ export async function PredictFixture(id: any, formData: FormData) {
             ...predictionData[fixtureId]
         }))
         const insertPromises = predictionArray.map(async (prediction: any) => {
-            console.log(prediction)
             await db.insert(predictions).values({
                 userId: id,
                 fixtureId: prediction.fixtureId,
@@ -173,6 +188,9 @@ export async function PredictFixture(id: any, formData: FormData) {
         await Promise.all(insertPromises)
         revalidatePath("/")
     } catch (error) {
-        console.log(error);
+        return {
+            type: "error",
+            message: "Error updating fixture scores: " + error
+        };
     }
 }
