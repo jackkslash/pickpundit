@@ -54,6 +54,7 @@ export const fixtureSchema = z.object({
 
 export const predictionFormSchema = z.object({
     id: z.coerce.number().min(1),
+    competitionId: z.coerce.number().min(1),
     score: z.coerce.number().min(1),
     team: z.string().min(1),
 })

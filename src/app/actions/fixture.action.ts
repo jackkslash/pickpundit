@@ -4,7 +4,6 @@ import { fixtures, predictions } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { fixtureSchema, predictionFormSchema } from "../types/zod.schema";
-import { error } from "console";
 
 export async function AddFixture(compId: number, formData: FormData) {
     try {
@@ -147,14 +146,15 @@ export async function UpdateFixture(fixtureId: number, homeTeamScore: number, aw
 
 export async function PredictFixture(id: any, formData: FormData) {
     try {
-        console.log(formData)
+
         const predictionData: any = {}
         formData.forEach((value, key) => {
-            console.log("value", value)
-            console.log("key", key)
-            const [fixtureId, team] = key.split("-")
+
+            const [fixtureId, competitionId, team] = key.split("-")
+
 
             const predictForm = predictionFormSchema.safeParse({
+                competitionId: competitionId,
                 id: fixtureId,
                 score: value,
                 team: team
@@ -167,18 +167,26 @@ export async function PredictFixture(id: any, formData: FormData) {
 
 
             if (!predictionData[fixtureId]) {
-                predictionData[fixtureId] = {}
+                predictionData[fixtureId] = {};
             }
-            predictionData[fixtureId][team] = Number(value)
+            if (!predictionData[fixtureId][competitionId]) {
+                predictionData[fixtureId][competitionId] = {};
+            }
+            predictionData[fixtureId][competitionId][team] = Number(value);
         })
 
-        const predictionArray = Object.keys(predictionData).map((fixtureId: any) => ({
-            fixtureId,
-            ...predictionData[fixtureId]
-        }))
+        const predictionArray = Object.keys(predictionData).flatMap(fixtureId =>
+            Object.keys(predictionData[fixtureId]).map(competitionId => ({
+                fixtureId,
+                competitionId,
+                ...predictionData[fixtureId][competitionId]
+            }))
+        );
+
         const insertPromises = predictionArray.map(async (prediction: any) => {
             await db.insert(predictions).values({
                 userId: id,
+                competitionsId: prediction.competitionId,
                 fixtureId: prediction.fixtureId,
                 predictedHomeScore: prediction.predictedHomeScore,
                 predictedAwayScore: prediction.predictedAwayScore
@@ -188,6 +196,7 @@ export async function PredictFixture(id: any, formData: FormData) {
         await Promise.all(insertPromises)
         revalidatePath("/")
     } catch (error) {
+        console.log(error)
         return {
             type: "error",
             message: "Error updating fixture scores: " + error

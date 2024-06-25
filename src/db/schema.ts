@@ -138,6 +138,9 @@ export const predictions = pgTable("prediction", {
     fixtureId: integer("fixtureId")
         .notNull()
         .references(() => fixtures.id, { onDelete: "cascade" }),
+    competitionsId: integer("competitionsId")
+        .notNull()
+        .references(() => competitions.id, { onDelete: "cascade" }),
     predictedHomeScore: integer("predictedHomeScore").notNull(),
     predictedAwayScore: integer("predictedAwayScore").notNull()
 });

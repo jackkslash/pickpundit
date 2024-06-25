@@ -1,7 +1,8 @@
 import { PredictFixture } from '@/app/actions/fixture.action';
+import FixturePrediction from '@/app/components/FixturePrediction';
 import { auth } from '@/auth';
 import db from '@/db';
-import { competitions, fixtures, teams } from '@/db/schema';
+import { competitions, fixtures, predictions, teams } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import React from 'react'
@@ -9,6 +10,10 @@ import React from 'react'
 export default async function page({ searchParams }: { searchParams: { competitionId: number, matchday: number, informalName: string } }) {
 
     const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+        throw new Error('User is not authenticated');
+    }
+
     const PredictFixturesWithID = PredictFixture.bind(null, session?.user.id);
     const homeTeamAlias = alias(teams, 'homeTeam');
     const awayTeamAlias = alias(teams, 'awayTeam');
@@ -18,6 +23,7 @@ export default async function page({ searchParams }: { searchParams: { competiti
     const matchdayFixturesData = await db.select({
         id: fixtures.id,
         date: fixtures.date,
+        competitionsId: fixtures.competitionId,
         homeTeamId: fixtures.homeTeamId,
         homeTeam: homeTeamAlias.name,
         homeTla: homeTeamAlias.tla,
@@ -30,14 +36,17 @@ export default async function page({ searchParams }: { searchParams: { competiti
         competitionId: fixtures.competitionId,
         matchday: fixtures.matchday,
         round: fixtures.round,
-        venue: fixtures.venue
+        venue: fixtures.venue,
+        userHomePrediction: predictions.predictedHomeScore,
+        userAwayPrediction: predictions.predictedAwayScore
     }).from(fixtures)
         .leftJoin(homeTeamAlias, eq(homeTeamAlias.id, fixtures.homeTeamId))
         .leftJoin(awayTeamAlias, eq(awayTeamAlias.id, fixtures.awayTeamId))
+        .leftJoin(predictions, eq(predictions.fixtureId, fixtures.id))
         .where(
             and(
                 eq(fixtures.competitionId, searchParams.competitionId),
-                eq(fixtures.matchday, searchParams.matchday)
+                eq(fixtures.matchday, searchParams.matchday),
             ))
         .orderBy(fixtures.matchday);
 
@@ -49,18 +58,7 @@ export default async function page({ searchParams }: { searchParams: { competiti
             <p>FIXTURES</p>
             <form action={PredictFixturesWithID} >
                 {matchdayFixturesData.map((fixture) => (
-                    <div key={fixture.id}>
-                        <p>Date: {fixture.date.toLocaleDateString()}</p>
-                        <p>Kickoff :{fixture.date.toLocaleTimeString()}</p>
-                        <p>Home Team: {fixture.homeTeam}</p>
-                        <p>Away Team: {fixture.awayTeam}</p>
-                        <p>Home Team Score: {fixture.homeTeamScore}</p>
-                        <p>Away Team Score: {fixture.awayTeamScore}</p>
-                        <input type="text" placeholder={"Home Team Prediction"} className='bg-black text-white outline-dashed outline-white' name={`${fixture.id}-predictedHomeScore`} />
-                        <br />
-                        <input type="text" placeholder={"Away Team Prediction"} className='bg-black text-white outline-dashed outline-white' name={`${fixture.id}-predictedAwayScore`} />
-                        <br />
-                    </div>
+                    <FixturePrediction key={fixture.id} fixture={fixture} />
                 ))}
                 <input type="submit" value="Submit" />
             </form>
