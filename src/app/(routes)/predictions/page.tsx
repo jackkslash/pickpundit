@@ -42,7 +42,10 @@ export default async function page({ searchParams }: { searchParams: { competiti
     }).from(fixtures)
         .leftJoin(homeTeamAlias, eq(homeTeamAlias.id, fixtures.homeTeamId))
         .leftJoin(awayTeamAlias, eq(awayTeamAlias.id, fixtures.awayTeamId))
-        .leftJoin(predictions, eq(predictions.fixtureId, fixtures.id))
+        .leftJoin(predictions, and(
+            eq(predictions.fixtureId, fixtures.id),
+            eq(predictions.userId, session.user.id)
+        ))
         .where(
             and(
                 eq(fixtures.competitionId, searchParams.competitionId),

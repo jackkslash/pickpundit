@@ -9,10 +9,20 @@ export default function FixturePrediction({ fixture }: { fixture: any }) {
             <p>Away Team: {fixture.awayTeam}</p>
             <p>Home Team Score: {fixture.homeTeamScore}</p>
             <p>Away Team Score: {fixture.awayTeamScore}</p>
-            <input type="text" placeholder={"Home Team Prediction"} className='bg-black text-white outline-dashed outline-white' name={`${fixture.id}-${fixture.competitionsId}-predictedHomeScore`} />
-            <br />
-            <input type="text" placeholder={"Away Team Prediction"} className='bg-black text-white outline-dashed outline-white' name={`${fixture.id}-${fixture.competitionsId}-predictedAwayScore`} />
-            <br />
+            {fixture.userHomePrediction
+                ? <p>Home Team Prediction: {fixture.userHomePrediction}</p>
+                : <div>
+                    <input type="text" placeholder={"Away Team Prediction"} className='bg-black text-white outline-dashed outline-white' name={`${fixture.id}-${fixture.competitionsId}-predictedAwayScore`} />
+                    <br />
+                </div>}
+            {fixture.userAwayPrediction
+                ? <p>Away Team Prediction: {fixture.userAwayPrediction}</p>
+                : <div>
+                    <input type="text" placeholder={"Away Team Prediction"} className='bg-black text-white outline-dashed outline-white' name={`${fixture.id}-${fixture.competitionsId}-predictedAwayScore`} />
+                    <br />
+                </div>}
+
+
         </div>
     )
 }

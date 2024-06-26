@@ -53,7 +53,7 @@ export default async function page({ params, searchParams }: { params: { compId:
             <h2>Teams</h2>
             {comp.map((c: any) =>
                 <div>
-                    <Team team={c} competitionId={params.compId}>
+                    <Team team={c} competitionId={params.compId} role={session?.user.role}>
                         {searchParams.type === "CUP" &&
                             c.id != null &&
                             c.group == null &&
