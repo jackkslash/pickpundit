@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import db from "@/db";
 import { competitions } from "@/db/schema";
 import Competitions from "./components/Competitions";
+import Link from "next/link";
 
 export default async function Home() {
   const session = await auth();
@@ -10,15 +11,6 @@ export default async function Home() {
     .orderBy(competitions.id)
 
   const dataCompsFiltered = dataComps.filter((comp: any) => comp.active == true)
-
-  if (session?.user.role == "admin") {
-    return (
-      <main>
-        <Competitions comps={dataComps} />
-      </main>
-    );
-  }
-
   return (
     <main>
       <Competitions comps={dataCompsFiltered} />

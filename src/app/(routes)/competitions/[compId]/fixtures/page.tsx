@@ -7,34 +7,52 @@ import { eq } from "drizzle-orm"
 import { alias } from "drizzle-orm/pg-core"
 
 export default async function page({ params }: { params: { compId: number } }) {
-
+    console.log(params)
     const session = await auth();
     const dataComp = await db.select()
         .from(competitions)
         .where(eq(competitions.id, params.compId))
+    let dataTeams
+    if (dataComp?.[0].type === "CUP") {
+        dataTeams = await db.select({
+            id: teams.id,
+            name: teams.name,
+            tla: teams.tla,
+            venue: teams.venue,
+            comp: competitions.id,
+            groupName: groups.name,
+            groupId: groupTeams.groupId
+        }).from(teams)
+            .innerJoin(teamsCompetitions,
+                eq(teamsCompetitions.teamId, teams.id)
+            )
+            .innerJoin(groupTeams,
+                eq(groupTeams.teamId, teams.id)
+            )
+            .innerJoin(groups,
+                eq(groups.id, groupTeams.groupId)
+            )
+            .innerJoin(competitions,
+                eq(competitions.id, teamsCompetitions.competitionId)
+            )
+            .where(eq(teamsCompetitions.competitionId, params.compId))
+    } else {
+        dataTeams = await db.select({
+            id: teams.id,
+            name: teams.name,
+            tla: teams.tla,
+            venue: teams.venue,
+            comp: competitions.id,
+        }).from(teams)
+            .innerJoin(teamsCompetitions,
+                eq(teamsCompetitions.teamId, teams.id)
+            )
+            .innerJoin(competitions,
+                eq(competitions.id, teamsCompetitions.competitionId)
+            )
+            .where(eq(teamsCompetitions.competitionId, params.compId))
+    }
 
-    const dataTeams = await db.select({
-        id: teams.id,
-        name: teams.name,
-        tla: teams.tla,
-        venue: teams.venue,
-        comp: competitions.id,
-        groupName: groups.name,
-        groupId: groupTeams.groupId
-    }).from(teams)
-        .innerJoin(teamsCompetitions,
-            eq(teamsCompetitions.teamId, teams.id)
-        )
-        .innerJoin(groupTeams,
-            eq(groupTeams.teamId, teams.id)
-        )
-        .innerJoin(groups,
-            eq(groups.id, groupTeams.groupId)
-        )
-        .innerJoin(competitions,
-            eq(competitions.id, teamsCompetitions.competitionId)
-        )
-        .where(eq(teamsCompetitions.competitionId, params.compId))
 
 
     const homeTeamAlias = alias(teams, 'homeTeam');
@@ -54,7 +72,6 @@ export default async function page({ params }: { params: { compId: number } }) {
         status: fixtures.status,
         competitionId: fixtures.competitionId,
         matchday: fixtures.matchday,
-        round: fixtures.round,
         venue: fixtures.venue
     }).from(fixtures)
         .leftJoin(homeTeamAlias, eq(homeTeamAlias.id, fixtures.homeTeamId))

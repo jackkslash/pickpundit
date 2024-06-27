@@ -49,7 +49,6 @@ export const fixtureSchema = z.object({
     homeTeamScore: z.coerce.number().min(0),
     awayTeamScore: z.coerce.number().min(0),
     matchday: z.coerce.number().min(1),
-    round: z.string().min(0),
 })
 
 export const predictionFormSchema = z.object({

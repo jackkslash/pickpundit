@@ -18,7 +18,6 @@ export async function AddFixture(compId: number, formData: FormData) {
             homeTeamScore: true,
             awayTeamScore: true,
             matchday: true,
-            round: true
         });
 
         const fixture = fixturePartialSchema.safeParse({
@@ -30,7 +29,6 @@ export async function AddFixture(compId: number, formData: FormData) {
             homeTeamScore: formData.get("homeTeamScore"),
             awayTeamScore: formData.get("awayTeamScore"),
             matchday: formData.get("matchday"),
-            round: formData.get("round")
         });
 
         if (!fixture.success) {

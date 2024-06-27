@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm"
 import {
     timestamp,
     pgTable,
@@ -7,6 +6,7 @@ import {
     integer,
     serial,
     boolean,
+    date,
 } from "drizzle-orm/pg-core"
 import { AdapterAccountType } from "next-auth/adapters"
 
@@ -74,6 +74,8 @@ export const competitions = pgTable("competition", {
     type: text("type").notNull(),
     emblem: text("emblem"),
     active: boolean("active").notNull().default(false),
+    dateStart: date("dateStart"),
+    dateEnd: date("dateEnd"),
 })
 
 export const teams = pgTable("team", {
@@ -127,7 +129,6 @@ export const fixtures = pgTable("fixture", {
     homeTeamScore: integer("homeTeamScore").default(0).notNull(),
     awayTeamScore: integer("awayTeamScore").default(0).notNull(),
     matchday: integer("matchday"),
-    round: text("round")
 });
 
 export const predictions = pgTable("prediction", {

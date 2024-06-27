@@ -1,5 +1,6 @@
 import React from 'react'
 import Comp from './Comp'
+import Link from 'next/link'
 
 function Competitions({ comps }: { comps: any }) {
     return (
@@ -10,6 +11,7 @@ function Competitions({ comps }: { comps: any }) {
                     <Comp competition={competition} />
                 </div>
             ))}
+            <Link className='flex justify-center' href="/competitions">All Competitions</Link>
         </div>
     )
 }

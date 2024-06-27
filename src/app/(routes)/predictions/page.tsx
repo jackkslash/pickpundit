@@ -35,7 +35,6 @@ export default async function page({ searchParams }: { searchParams: { competiti
         status: fixtures.status,
         competitionId: fixtures.competitionId,
         matchday: fixtures.matchday,
-        round: fixtures.round,
         venue: fixtures.venue,
         userHomePrediction: predictions.predictedHomeScore,
         userAwayPrediction: predictions.predictedAwayScore
