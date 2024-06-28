@@ -3,7 +3,7 @@ import { useState } from "react";
 import Fixture from "./Fixture";
 import Link from "next/link";
 
-export default function Fixtures({ fixtures, role }: { fixtures: any, role?: string }) {
+export default function Fixtures({ fixtures, role, matchdays }: { fixtures: any, role?: string, matchdays: any }) {
     const [matchday, setMatchday] = useState('1');
     console.log(fixtures[0])
 
@@ -13,14 +13,14 @@ export default function Fixtures({ fixtures, role }: { fixtures: any, role?: str
         return (
             <div className="flex flex-col items-center justify-center gap-6 ">
                 <select onChange={(e) => setMatchday(e.target.value)} className="text-white bg-black" value={matchday}>
-                    <option value="">All</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
+                    {matchdays.map((m: any) => (
+                        <option className="text-white" key={m} value={m}>{m}</option>
+                    ))}
                 </select>
                 {
                     fixtures
                         .filter((fixture: { homeTeam: string; awayTeam: string; matchday: number }) =>
-                            fixture.matchday.toString().includes(matchday.toLowerCase())
+                            fixture.matchday === parseInt(matchday)
                         )
                         .map((f: any) => (
                             <Fixture key={f.id} fixture={f} role={role} />
