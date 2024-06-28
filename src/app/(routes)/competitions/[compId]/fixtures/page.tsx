@@ -38,6 +38,7 @@ export default async function page({ params }: { params: { compId: number } }) {
             .where(eq(teamsCompetitions.competitionId, params.compId))
     } else {
         dataTeams = await db.select({
+            competitionsId: competitions.id,
             id: teams.id,
             name: teams.name,
             tla: teams.tla,
