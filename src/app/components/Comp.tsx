@@ -17,15 +17,19 @@ const Comp = async ({ competition }: { competition: any }) => {
                 <div>{competition.id}</div>
             </div>
 
-            {session?.user.role === "admin" && (
-                <div className="flex text-white gap-4 pb-4">
-                    <Link href={`/competitions/${competition.id}/fixtures`}>Fixtures</Link>
-                    <Link href={`/competitions/` + competition.id + `?formalName=` + competition.formalName + '&type=' + competition.type}>Edit</Link>
-                    <form action={deleteCompWithId}>
-                        <button type="submit">Delete</button>
-                    </form>
-                </div>
-            )}
+
+            <div className="flex text-white gap-4 pb-4">
+                <Link href={`/competitions/${competition.id}/standings`}>Standings</Link>
+                <Link href={`/competitions/${competition.id}/fixtures`}>Fixtures</Link>
+                {session?.user.role === "admin" && (
+                    <>
+                        <Link href={`/competitions/` + competition.id + `?formalName=` + competition.formalName + '&type=' + competition.type}>Edit</Link>
+                        <form action={deleteCompWithId}>
+                            <button type="submit">Delete</button>
+                        </form>
+                    </>)}
+            </div>
+
         </div>
     );
 };

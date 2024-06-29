@@ -41,7 +41,7 @@ export default function Fixtures({ fixtures, role, matchdays }: { fixtures: any,
                         ))
                 }
                 {matchday !== "" &&
-                    <Link href={`/predictions?competitionId=${fixtures[0]?.competitionId}&matchday=${matchday}`}> - Predict Matchday {matchday} Matches - </Link>}
+                    <Link href={`/predictions/fixtures?competitionId=${fixtures[0]?.competitionId}&matchday=${matchday}`}> - Predict Matchday {matchday} Matches - </Link>}
             </div>
         )
     }

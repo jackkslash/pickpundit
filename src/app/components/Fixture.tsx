@@ -1,5 +1,5 @@
 'use client'
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { DeleteFixture, UpdateFixture } from "../actions/fixture.action";
 
 export default function Fixture({ fixture, role }: { fixture: any, role?: string }) {
