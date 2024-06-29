@@ -28,7 +28,7 @@ export default function Fixture({ fixture, role }: { fixture: any, role?: string
     return (
         <div className="flex flex-col items-center justify-center">
             <div className="flex flex-col justify-center w-full h-full">
-                <p>Matchday {fixture.matchday}</p>
+                {/* <p>Matchday {fixture.matchday}</p> */}
                 <p className="text-white">
                     {fixture.homeTeam}{' '}
                     {isEditing ? (
