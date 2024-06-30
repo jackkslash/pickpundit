@@ -145,3 +145,22 @@ export const predictions = pgTable("prediction", {
     predictedHomeScore: integer("predictedHomeScore").notNull(),
     predictedAwayScore: integer("predictedAwayScore").notNull()
 });
+
+export const standings = pgTable("standing", {
+    id: serial("id").primaryKey(),
+    competitionId: integer("competitionId")
+        .notNull()
+        .references(() => competitions.id, { onDelete: "cascade" }),
+    teamId: integer("teamId")
+        .notNull()
+        .references(() => teams.id, { onDelete: "cascade" }),
+    position: integer("position").notNull(),
+    playedGames: integer("playedGames").notNull().default(0),
+    won: integer("won").notNull().default(0),
+    drawn: integer("drawn").notNull().default(0),
+    lost: integer("lost").notNull().default(0),
+    points: integer("points").notNull().default(0),
+    goalsFor: integer("goalsFor").notNull().default(0),
+    goalsAgainst: integer("goalsAgainst").notNull().default(0),
+    goalDifference: integer("goalDifference").notNull().default(0),
+})

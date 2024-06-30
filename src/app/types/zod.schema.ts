@@ -57,3 +57,18 @@ export const predictionFormSchema = z.object({
     score: z.coerce.number().min(1),
     team: z.string().min(1),
 })
+
+export const standingsSchema = z.object({
+    id: z.coerce.number().min(1),
+    competitionId: z.coerce.number().min(1),
+    teamId: z.coerce.number().min(1),
+    position: z.coerce.number().min(1),
+    playedGames: z.coerce.number().min(1),
+    won: z.coerce.number().min(1),
+    drawn: z.coerce.number().min(1),
+    lost: z.coerce.number().min(1),
+    points: z.coerce.number().min(1),
+    goalsFor: z.coerce.number().min(1),
+    goalsAgainst: z.coerce.number().min(1),
+    goalDifference: z.coerce.number().min(1)
+})
