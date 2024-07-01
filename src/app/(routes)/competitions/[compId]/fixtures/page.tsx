@@ -2,7 +2,7 @@ import AddFixtureForm from "@/app/components/AddFixtureForm"
 import Fixtures from "@/app/components/Fixtures"
 import { auth } from "@/auth"
 import db from "@/db"
-import { competitions, fixtures, groupTeams, groups, teams, teamsCompetitions } from "@/db/schema"
+import { competitions, fixtures, teams, teamsCompetitions } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { alias } from "drizzle-orm/pg-core"
 
@@ -12,47 +12,22 @@ export default async function page({ params }: { params: { compId: number } }) {
     const dataComp = await db.select()
         .from(competitions)
         .where(eq(competitions.id, params.compId))
-    let dataTeams
-    if (dataComp?.[0].type === "CUP") {
-        dataTeams = await db.select({
-            id: teams.id,
-            name: teams.name,
-            tla: teams.tla,
-            venue: teams.venue,
-            comp: competitions.id,
-            groupName: groups.name,
-            groupId: groupTeams.groupId
-        }).from(teams)
-            .innerJoin(teamsCompetitions,
-                eq(teamsCompetitions.teamId, teams.id)
-            )
-            .innerJoin(groupTeams,
-                eq(groupTeams.teamId, teams.id)
-            )
-            .innerJoin(groups,
-                eq(groups.id, groupTeams.groupId)
-            )
-            .innerJoin(competitions,
-                eq(competitions.id, teamsCompetitions.competitionId)
-            )
-            .where(eq(teamsCompetitions.competitionId, params.compId))
-    } else {
-        dataTeams = await db.select({
-            competitionsId: competitions.id,
-            id: teams.id,
-            name: teams.name,
-            tla: teams.tla,
-            venue: teams.venue,
-            comp: competitions.id,
-        }).from(teams)
-            .innerJoin(teamsCompetitions,
-                eq(teamsCompetitions.teamId, teams.id)
-            )
-            .innerJoin(competitions,
-                eq(competitions.id, teamsCompetitions.competitionId)
-            )
-            .where(eq(teamsCompetitions.competitionId, params.compId))
-    }
+    const dataTeams = await db.select({
+        competitionsId: competitions.id,
+        id: teams.id,
+        name: teams.name,
+        tla: teams.tla,
+        venue: teams.venue,
+        comp: competitions.id,
+    }).from(teams)
+        .innerJoin(teamsCompetitions,
+            eq(teamsCompetitions.teamId, teams.id)
+        )
+        .innerJoin(competitions,
+            eq(competitions.id, teamsCompetitions.competitionId)
+        )
+        .where(eq(teamsCompetitions.competitionId, params.compId))
+
 
 
 
@@ -81,10 +56,6 @@ export default async function page({ params }: { params: { compId: number } }) {
         .orderBy(fixtures.matchday);
 
     const uniqueMatchdays = [...new Set(fixturesData.map(match => match.matchday))];
-    console.log(dataComp)
-    console.log(dataTeams)
-    console.log(fixturesData)
-
 
     return (
         <div className="flex flex-col items-center justify-center gap-6 pt-6 text-sm">

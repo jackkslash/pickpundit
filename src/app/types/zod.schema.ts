@@ -22,17 +22,6 @@ export const teamSchema = z.object({
     venue: z.string().min(1),
 })
 
-export const groupSchema = z.object({
-    id: z.number().min(1),
-    competitionId: z.coerce.number().min(1),
-    name: z.string().min(1),
-})
-
-export const groupTeamSchema = z.object({
-    teamId: z.number().min(1),
-    groupId: z.coerce.number().min(1),
-})
-
 export const teamsCompetitionsSchema = z.object({
     teamId: z.coerce.number().min(1),
     competitionId: z.coerce.number().min(1),

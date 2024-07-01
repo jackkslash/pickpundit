@@ -1,6 +1,6 @@
 'use server'
 import db from "@/db";
-import { teams, teamsCompetitions, groupTeams, standings } from "@/db/schema";
+import { teams, teamsCompetitions, standings } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { teamSchema, teamsCompetitionsSchema } from "../types/zod.schema";
@@ -91,10 +91,6 @@ export async function DeleteTeam(teamId: number, competitionId: number) {
                 eq(teamsCompetitions.teamId, teamComps.data.teamId),
                 eq(teamsCompetitions.competitionId, teamComps.data.competitionId)
             ));
-
-            await db.delete(groupTeams).where(
-                eq(groupTeams.teamId, teamComps.data.teamId)
-            );
 
             await db.delete(standings).where(
                 eq(standings.teamId, teamComps.data.teamId)

@@ -23,7 +23,7 @@ const Comp = async ({ competition }: { competition: any }) => {
                 <Link href={`/competitions/${competition.id}/fixtures`}>Fixtures</Link>
                 {session?.user.role === "admin" && (
                     <>
-                        <Link href={`/competitions/` + competition.id + `?formalName=` + competition.formalName + '&type=' + competition.type}>Edit</Link>
+                        <Link href={`/competitions/` + competition.id + `?formalName=` + competition.formalName}>Edit</Link>
                         <form action={deleteCompWithId}>
                             <button type="submit">Delete</button>
                         </form>

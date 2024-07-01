@@ -23,7 +23,6 @@ const Team = ({ team, children, competitionId, role }: { team: any, children?: a
                 <p>{team.founded}</p>
                 <p>{team.clubColors}</p>
                 <p>{team.venue}</p>
-                {team.group && <p>{team.group}</p>}
 
                 {role == "admin" &&
                     <form action={deleteTeamBind}>

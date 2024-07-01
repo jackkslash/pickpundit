@@ -20,8 +20,6 @@ export default function AddFixtureForm({ teams, comp }: { teams: any, comp: any 
         }
     };
 
-    const roundNames = ['Group Stage', 'Round of 16', 'Quarterfinals', 'Semifinals', 'Final']
-
     const AddFixturesWithId = AddFixture.bind(null, comp.id)
 
     return (
@@ -54,19 +52,6 @@ export default function AddFixtureForm({ teams, comp }: { teams: any, comp: any 
                 <input className="text-black" type="text" name="newVenue" id="newVenue" />
                 <label>Matchday</label>
                 <input className="text-black" type="text" name="matchday" id="matchday" />
-                {
-                    comp.type === "CUP" &&
-                    <div className="flex flex-col gap-2">
-                        <label>Round</label>
-                        <select name="round" id="round" className="text-black">
-                            <option value="" className="text-black">None</option>
-                            {roundNames.map((r: any, index: number) => (
-                                <option className="text-black" key={index} value={r}>{r}</option>
-                            ))}
-                        </select>
-                    </div>
-                }
-
                 <button type="submit">Add</button>
             </form>
         </div>
