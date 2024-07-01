@@ -1,6 +1,6 @@
 'use server'
 import db from "@/db";
-import { competitions, teamsCompetitions } from "@/db/schema";
+import { competitions, teamsCompetitions, standings } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { competitionSchema, teamsCompetitionsSchema } from "../types/zod.schema";
@@ -76,6 +76,7 @@ export async function DeleteComp(competitionId: number) {
 
 export async function AddTeamToComp(competitionId: number, prevState: any, formData: FormData,) {
     try {
+
         console.log(competitionId)
         const teamsComp = teamsCompetitionsSchema.safeParse({
             teamId: formData.get("id"),
@@ -94,12 +95,35 @@ export async function AddTeamToComp(competitionId: number, prevState: any, formD
                 eq(teamsCompetitions.teamId, teamsComp.data.teamId),
                 eq(teamsCompetitions.competitionId, teamsComp.data.competitionId)))
 
+
+        const competition = await db.query.competitions.findFirst({
+            where: eq(competitions.id, competitionId)
+        })
+
+
         if (exists.length == 0) {
             await db.insert(teamsCompetitions).values(teamsComp.data)
+            if (competition?.type === 'LEAGUE') {
+
+                await db.insert(standings).values({
+                    teamId: teamsComp.data.teamId,
+                    competitionId: teamsComp.data.competitionId,
+                    position: 0,
+                    playedGames: 0,
+                    won: 0,
+                    drawn: 0,
+                    lost: 0,
+                    points: 0,
+                    goalsFor: 0,
+                    goalsAgainst: 0,
+                    goalDifference: 0
+                })
+
+            }
             revalidatePath("/")
             return {
                 type: "success",
-                message: "Team added to competition"
+                message: "Team added to competition successfully"
             }
         }
         return {

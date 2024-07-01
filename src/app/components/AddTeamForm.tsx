@@ -23,7 +23,8 @@ export default function AddTeamForm({ allTeams, competitionId }: { allTeams: any
                             <><option className='text-black' value={parseInt(t.id)}>{t.name}</option></>
                         )
                     }</select>
-                <p className="text-red-500">{state.message}</p>
+                {state.type === "error" && <p className='text-red-500'>{state.message}</p>}
+                {state.type === "success" && <p className='text-green-500'>{state.message}</p>}
                 <button type="submit">Add</button>
             </form>
         </div>
