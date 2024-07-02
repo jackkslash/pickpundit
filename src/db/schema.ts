@@ -7,6 +7,7 @@ import {
     serial,
     boolean,
     date,
+    jsonb,
 } from "drizzle-orm/pg-core"
 import { AdapterAccountType } from "next-auth/adapters"
 
@@ -146,3 +147,4 @@ export const standings = pgTable("standing", {
     goalsAgainst: integer("goalsAgainst").notNull().default(0),
     goalDifference: integer("goalDifference").notNull().default(0),
 })
+
