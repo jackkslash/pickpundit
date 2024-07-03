@@ -22,7 +22,6 @@ export default async function compStandings({ params }: { params: { compId: numb
         .fullJoin(teams, eq(standings.teamId, teams.id))
         .fullJoin(competitions, eq(standings.competitionId, competitions.id))
         .where(eq(standings.competitionId, params.compId))
-    console.log(data)
     return (
         <div className="bg-black text-white p-5 w-full">
             <h2 className=" mb-2">PREMIER LEAGUE TABLE 2019/20</h2>
@@ -60,7 +59,7 @@ export default async function compStandings({ params }: { params: { compId: numb
                     ))}
                 </tbody>
             </table>
-            <Link href={`/predictions/fixtures?competitionId=${params.compId}`}> - Predict Standings - </Link>
+            <Link href={`/predictions/standings?competitionId=${params.compId}`}> - Predict Standings - </Link>
         </div>
 
     )
