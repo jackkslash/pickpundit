@@ -144,7 +144,7 @@ export async function UpdateFixture(fixtureId: number, homeTeamScore: number, aw
 
 export async function PredictFixture(id: any, formData: FormData) {
     try {
-
+        console.log(formData)
         const predictionData: any = {}
         formData.forEach((value, key) => {
 
@@ -180,7 +180,7 @@ export async function PredictFixture(id: any, formData: FormData) {
                 ...predictionData[fixtureId][competitionId]
             }))
         );
-
+        console.log(predictionArray)
         const insertPromises = predictionArray.map(async (prediction: any) => {
             await db.insert(predictions).values({
                 userId: id,

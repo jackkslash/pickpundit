@@ -61,3 +61,9 @@ export const standingsSchema = z.object({
     goalsAgainst: z.coerce.number().min(1),
     goalDifference: z.coerce.number().min(1)
 })
+
+export const standingPredictionSchema = z.object({
+    userId: z.string(),
+    competitionId: z.number().min(1),
+    predictions: z.array(z.any())
+});

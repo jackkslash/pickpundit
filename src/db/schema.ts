@@ -148,3 +148,10 @@ export const standings = pgTable("standing", {
     goalDifference: integer("goalDifference").notNull().default(0),
 })
 
+export const standingPredictions = pgTable("standingsPrediction", {
+    id: serial("id").primaryKey(),
+    userId: text("userId").notNull(),
+    competitionId: integer("competitionId").notNull(),
+    predictions: jsonb("predictions").notNull(),
+    createdAt: timestamp("createdAt").defaultNow(),
+});

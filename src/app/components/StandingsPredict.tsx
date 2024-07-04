@@ -3,12 +3,12 @@ import { Reorder } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 import { standingsPrediction } from '@/app/actions/standings.action'
 
-export default function StandingsPredict({ data }: any) {
+export default function StandingsPredict({ data, competitionId }: any) {
     const [teams, setTeams] = useState(data)
     const [promoted, setPromoted] = useState<any[]>([])
     const [playoff, setPlayoff] = useState<any[]>([])
     const [relegate, setRelegated] = useState<any[]>([])
-    const testWithData = standingsPrediction.bind(null, teams)
+    const standingPredictionWithData = standingsPrediction.bind(null, teams, competitionId)
 
     useEffect(() => {
         setPromoted([teams[0], teams[1]])
@@ -17,7 +17,7 @@ export default function StandingsPredict({ data }: any) {
     }, [teams])
 
     return (
-        <><form action={testWithData}>
+        <><form action={standingPredictionWithData}>
             <Reorder.Group values={data} onReorder={setTeams}>
                 {teams.map((team: any, index: any) => (
                     <Reorder.Item key={team.team} value={team} drag={true}>
