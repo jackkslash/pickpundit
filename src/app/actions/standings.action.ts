@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import db from "@/db";
 import { standingPredictions } from "@/db/schema";
 import { standingPredictionSchema } from "../types/zod.schema";
+import { revalidatePath } from "next/cache";
 
 export async function standingsPrediction(predictStand: any, competitionId: number) {
     const compId = Number(competitionId)
@@ -26,7 +27,7 @@ export async function standingsPrediction(predictStand: any, competitionId: numb
     }
 
     await db.insert(standingPredictions).values(standingPrediction.data)
-
+    revalidatePath('/')
     return {
         type: "success",
         message: "Predictions sent"

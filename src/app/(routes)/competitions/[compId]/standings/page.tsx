@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import React from 'react'
 import { competitions, standings, teams } from '@/db/schema'
 import Link from 'next/link'
+import StandingsTable from '@/app/components/StandingsTable'
 
 export default async function compStandings({ params }: { params: { compId: number } }) {
 
@@ -25,40 +26,7 @@ export default async function compStandings({ params }: { params: { compId: numb
     return (
         <div className="bg-black text-white p-5 w-full">
             <h2 className=" mb-2">PREMIER LEAGUE TABLE 2019/20</h2>
-            <table className="w-full table-auto">
-                <colgroup>
-                    <col className="w-1/3" />
-                    <col className="w-1/12" />
-                </colgroup>
-                <thead>
-                    <tr className=" text-left">
-                        <th>Team</th>
-                        <th>P</th>
-                        <th>W</th>
-                        <th>D</th>
-                        <th>L</th>
-                        <th>F</th>
-                        <th>A</th>
-                        <th>Pts</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((team, index) => (
-                        <tr key={team.team} className={`
-              ${index % 2 === 0 ? 'text-white' : 'text-cyan-400'}
-            `}>
-                            <td className="text-left">{`${team.position} ${team.team}`}</td>
-                            <td>{team.played}</td>
-                            <td>{team.won}</td>
-                            <td>{team.drawn}</td>
-                            <td>{team.lost}</td>
-                            <td>{team.goalsFor}</td>
-                            <td>{team.goalsAgainst}</td>
-                            <td>{team.points}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <StandingsTable data={data} />
             <Link href={`/predictions/standings?competitionId=${params.compId}`}> - Predict Standings - </Link>
         </div>
 
