@@ -139,3 +139,33 @@ export async function AddTeamToComp(competitionId: number, prevState: any, formD
         }
     }
 }
+
+export async function StateChange(competitionId: number) {
+    const compId = Number(competitionId)
+
+    // Fetch the current active state
+    const currentComp = await db.select({ active: competitions.active })
+        .from(competitions)
+        .where(eq(competitions.id, compId))
+        .limit(1)
+
+    if (currentComp.length === 0) {
+        return {
+            type: "error",
+            message: "Competition not found"
+        }
+    }
+
+    const newActiveState = !currentComp[0].active
+
+    await db.update(competitions)
+        .set({ active: newActiveState })
+        .where(eq(competitions.id, compId))
+
+    revalidatePath("/")
+
+    return {
+        type: "success",
+        message: `Competition set to ${newActiveState ? 'active' : 'inactive'}`
+    }
+}
