@@ -4,11 +4,23 @@ import { fixtures, predictions } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { fixtureSchema, predictionFormSchema } from "../types/zod.schema";
+import { auth } from "@/auth";
 
 export async function AddFixture(compId: number, formData: FormData) {
     try {
-        console.log(formData)
-        console.log(compId)
+        const session = await auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to add a fixture"
+            }
+        }
+        if (session.user.role !== 'admin') {
+            return {
+                type: "error",
+                message: "You must be an admin to add a fixture"
+            }
+        }
         const fixturePartialSchema = fixtureSchema.pick({
             competitionId: true,
             homeTeamId: true,
@@ -60,6 +72,19 @@ export async function AddFixture(compId: number, formData: FormData) {
 
 export async function DeleteFixture(fixtureId: number, competitionId: number) {
     try {
+        const session = await auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to delete a fixture"
+            }
+        }
+        if (session.user.role !== 'admin') {
+            return {
+                type: "error",
+                message: "You must be an admin to delete a fixture"
+            }
+        }
         const fixture = fixtureSchema.pick({
             id: true
         }).safeParse({
@@ -99,6 +124,19 @@ export async function DeleteFixture(fixtureId: number, competitionId: number) {
 
 export async function UpdateFixture(fixtureId: number, homeTeamScore: number, awayTeamScore: number, status: string) {
     try {
+        const session = await auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to update fixture scores"
+            }
+        }
+        if (session.user.role !== 'admin') {
+            return {
+                type: "error",
+                message: "You must be an admin to update fixture scores"
+            }
+        }
         const fixture = fixtureSchema.pick({
             id: true,
             homeTeamScore: true,
@@ -144,7 +182,13 @@ export async function UpdateFixture(fixtureId: number, homeTeamScore: number, aw
 
 export async function PredictFixture(id: any, formData: FormData) {
     try {
-        console.log(formData)
+        const session = auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to predict scores"
+            }
+        }
         const predictionData: any = {}
         formData.forEach((value, key) => {
 

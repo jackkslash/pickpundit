@@ -4,9 +4,24 @@ import { competitions, teamsCompetitions, standings } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { competitionSchema, teamsCompetitionsSchema } from "../types/zod.schema";
+import { auth } from "@/auth";
 
 export async function SubmitComp(formData: FormData) {
+
     try {
+        const session = await auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to submit a competition"
+            }
+        }
+        if (session.user.role !== 'admin') {
+            return {
+                type: "error",
+                message: "You must be an admin to submit a competition"
+            }
+        }
         const competitionPartialSchema = competitionSchema.pick({
             formalName: true,
             informalName: true,
@@ -49,6 +64,19 @@ export async function SubmitComp(formData: FormData) {
 export async function DeleteComp(competitionId: number) {
 
     try {
+        const session = await auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to delete a competition"
+            }
+        }
+        if (session.user.role !== 'admin') {
+            return {
+                type: "error",
+                message: "You must be an admin to delete a competition"
+            }
+        }
         const compPartialSchema = competitionSchema.pick({
             id: true
         })
@@ -76,7 +104,19 @@ export async function DeleteComp(competitionId: number) {
 
 export async function AddTeamToComp(competitionId: number, prevState: any, formData: FormData,) {
     try {
-
+        const session = await auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to add a team to a competition"
+            }
+        }
+        if (session.user.role !== 'admin') {
+            return {
+                type: "error",
+                message: "You must be an admin to add a team to a competition"
+            }
+        }
         console.log(competitionId)
         const teamsComp = teamsCompetitionsSchema.safeParse({
             teamId: formData.get("id"),
@@ -141,31 +181,51 @@ export async function AddTeamToComp(competitionId: number, prevState: any, formD
 }
 
 export async function StateChange(competitionId: number) {
-    const compId = Number(competitionId)
+    try {
+        const session = await auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to change the state of a competition"
+            }
+        }
+        if (session.user.role !== 'admin') {
+            return {
+                type: "error",
+                message: "You must be an admin to change the state of a competition"
+            }
+        }
+        const compId = Number(competitionId)
 
-    // Fetch the current active state
-    const currentComp = await db.select({ active: competitions.active })
-        .from(competitions)
-        .where(eq(competitions.id, compId))
-        .limit(1)
+        // Fetch the current active state
+        const currentComp = await db.select({ active: competitions.active })
+            .from(competitions)
+            .where(eq(competitions.id, compId))
+            .limit(1)
 
-    if (currentComp.length === 0) {
+        if (currentComp.length === 0) {
+            return {
+                type: "error",
+                message: "Competition not found"
+            }
+        }
+
+        const newActiveState = !currentComp[0].active
+
+        await db.update(competitions)
+            .set({ active: newActiveState })
+            .where(eq(competitions.id, compId))
+
+        revalidatePath("/")
+
+        return {
+            type: "success",
+            message: `Competition set to ${newActiveState ? 'active' : 'inactive'}`
+        }
+    } catch (error) {
         return {
             type: "error",
-            message: "Competition not found"
+            message: "Error changing competition state: " + error
         }
-    }
-
-    const newActiveState = !currentComp[0].active
-
-    await db.update(competitions)
-        .set({ active: newActiveState })
-        .where(eq(competitions.id, compId))
-
-    revalidatePath("/")
-
-    return {
-        type: "success",
-        message: `Competition set to ${newActiveState ? 'active' : 'inactive'}`
     }
 }

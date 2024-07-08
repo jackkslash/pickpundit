@@ -4,10 +4,24 @@ import { teams, teamsCompetitions, standings } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { teamSchema, teamsCompetitionsSchema } from "../types/zod.schema";
+import { auth } from "@/auth";
 
 export async function SubmitTeam(formData: FormData) {
 
     try {
+        const session = await auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to submit a team"
+            }
+        }
+        if (session.user.role !== 'admin') {
+            return {
+                type: "error",
+                message: "You must be an admin to submit a team"
+            }
+        }
         const teamPartialSchema = teamSchema.pick({
             name: true,
             shortName: true,
@@ -56,6 +70,19 @@ export async function SubmitTeam(formData: FormData) {
 
 export async function DeleteTeam(teamId: number, competitionId: number) {
     try {
+        const session = await auth();
+        if (!session) {
+            return {
+                type: "error",
+                message: "You must be logged in to delete a team"
+            }
+        }
+        if (session.user.role !== 'admin') {
+            return {
+                type: "error",
+                message: "You must be an admin to delete a team"
+            }
+        }
         if (!competitionId) {
             const teamCompsPartialSchema = teamsCompetitionsSchema.pick({
                 teamId: true,
