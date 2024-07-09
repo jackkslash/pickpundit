@@ -13,7 +13,7 @@ export default async function NavBar() {
                 <p>PickPundit</p>
                 {session != null ? (
                     <div className='flex flex-row space-x-2 justify-center sm:space-x-4' >
-                        <a href="/me">Me</a>
+                        <a href={"/" + session.user.username}>Me</a>
                         {debug &&
                             <form
                                 action={async () => {
