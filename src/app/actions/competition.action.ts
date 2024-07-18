@@ -6,22 +6,22 @@ import { revalidatePath } from "next/cache";
 import { competitionSchema, teamsCompetitionsSchema } from "../types/zod.schema";
 import { auth } from "@/auth";
 
-export async function SubmitComp(formData: FormData) {
+const checkAdminAuth = async () => {
+    const session = await auth();
+    if (!session) {
+        return { type: "error", message: "You must be logged in to perform this action" };
+    }
+    if (session.user.role !== 'admin') {
+        return { type: "error", message: "You must be an admin to perform this action" };
+    }
+    return null;
+};
 
+export async function SubmitComp(formData: FormData) {
     try {
-        const session = await auth();
-        if (!session) {
-            return {
-                type: "error",
-                message: "You must be logged in to submit a competition"
-            }
-        }
-        if (session.user.role !== 'admin') {
-            return {
-                type: "error",
-                message: "You must be an admin to submit a competition"
-            }
-        }
+        const authError = await checkAdminAuth();
+        if (authError) return authError;
+
         const competitionPartialSchema = competitionSchema.pick({
             formalName: true,
             informalName: true,
@@ -30,202 +30,114 @@ export async function SubmitComp(formData: FormData) {
             emblem: true
         });
 
-        const competition = competitionPartialSchema.safeParse({
-            formalName: formData.get("formalName"),
-            informalName: formData.get("informalName"),
-            code: formData.get("code"),
-            type: formData.get("type"),
-            emblem: formData.get("emblem")
-        });
+        const competition = competitionPartialSchema.safeParse(Object.fromEntries(formData));
         if (!competition.success) {
-            return {
-                type: "error",
-                message: competition.error.message
-            }
+            return { type: "error", message: competition.error.message };
         }
 
-        await db.insert(competitions).values(
-            competition.data
-        )
-
-        revalidatePath("/")
-        return {
-            type: "success",
-            message: "Competition added"
-        }
+        await db.insert(competitions).values(competition.data);
+        revalidatePath("/");
+        return { type: "success", message: "Competition added" };
     } catch (error) {
-        return {
-            type: "error",
-            message: "Error submitting competition: " + error
-        }
+        return { type: "error", message: `Error submitting competition: ${error}` };
     }
 }
-
 export async function DeleteComp(competitionId: number) {
-
     try {
-        const session = await auth();
-        if (!session) {
-            return {
-                type: "error",
-                message: "You must be logged in to delete a competition"
-            }
-        }
-        if (session.user.role !== 'admin') {
-            return {
-                type: "error",
-                message: "You must be an admin to delete a competition"
-            }
-        }
-        const compPartialSchema = competitionSchema.pick({
-            id: true
-        })
-        const compId = compPartialSchema.safeParse({ id: competitionId })
+        const authError = await checkAdminAuth();
+        if (authError) return authError;
+
+        const compPartialSchema = competitionSchema.pick({ id: true });
+        const compId = compPartialSchema.safeParse({ id: competitionId });
         if (!compId.success) {
-            return {
-                type: "error",
-                message: compId.error.message
-            }
+            return { type: "error", message: compId.error.message };
         }
 
-        await db.delete(competitions).where(eq(competitions.id, compId.data.id))
-        revalidatePath("/")
-        return {
-            type: "success",
-            message: "Competition deleted"
-        }
+        await db.delete(competitions).where(eq(competitions.id, compId.data.id));
+        revalidatePath("/");
+        return { type: "success", message: "Competition deleted" };
     } catch (error) {
-        return {
-            type: "error",
-            message: "Error deleting competition: " + error
-        }
+        return { type: "error", message: `Error deleting competition: ${error}` };
     }
 }
 
-export async function AddTeamToComp(competitionId: number, prevState: any, formData: FormData,) {
+export async function AddTeamToComp(competitionId: number, prevState: any, formData: FormData) {
     try {
-        const session = await auth();
-        if (!session) {
-            return {
-                type: "error",
-                message: "You must be logged in to add a team to a competition"
-            }
-        }
-        if (session.user.role !== 'admin') {
-            return {
-                type: "error",
-                message: "You must be an admin to add a team to a competition"
-            }
-        }
-        console.log(competitionId)
+        const authError = await checkAdminAuth();
+        if (authError) return authError;
+
         const teamsComp = teamsCompetitionsSchema.safeParse({
             teamId: formData.get("id"),
             competitionId: competitionId
-        })
+        });
 
         if (!teamsComp.success) {
-            return {
-                type: "error",
-                message: "Error adding team to competition: " + teamsComp.error.message
-            }
+            return { type: "error", message: `Error adding team to competition: ${teamsComp.error.message}` };
         }
 
         const exists = await db.select().from(teamsCompetitions)
             .where(and(
                 eq(teamsCompetitions.teamId, teamsComp.data.teamId),
-                eq(teamsCompetitions.competitionId, teamsComp.data.competitionId)))
+                eq(teamsCompetitions.competitionId, teamsComp.data.competitionId)
+            ));
 
+        if (exists.length > 0) {
+            return { type: "error", message: "Team already in competition" };
+        }
 
         const competition = await db.query.competitions.findFirst({
             where: eq(competitions.id, competitionId)
-        })
+        });
 
+        await db.insert(teamsCompetitions).values(teamsComp.data);
 
-        if (exists.length == 0) {
-            await db.insert(teamsCompetitions).values(teamsComp.data)
-            if (competition?.type === 'LEAGUE') {
-
-                await db.insert(standings).values({
-                    teamId: teamsComp.data.teamId,
-                    competitionId: teamsComp.data.competitionId,
-                    position: 0,
-                    playedGames: 0,
-                    won: 0,
-                    drawn: 0,
-                    lost: 0,
-                    points: 0,
-                    goalsFor: 0,
-                    goalsAgainst: 0,
-                    goalDifference: 0
-                })
-
-            }
-            revalidatePath("/")
-            return {
-                type: "success",
-                message: "Team added to competition successfully"
-            }
-        }
-        return {
-            type: "error",
-            message: "Team already in competition"
+        if (competition?.type === 'LEAGUE') {
+            await db.insert(standings).values({
+                teamId: teamsComp.data.teamId,
+                competitionId: teamsComp.data.competitionId,
+                position: 0,
+                playedGames: 0,
+                won: 0,
+                drawn: 0,
+                lost: 0,
+                points: 0,
+                goalsFor: 0,
+                goalsAgainst: 0,
+                goalDifference: 0
+            });
         }
 
-
+        revalidatePath("/");
+        return { type: "success", message: "Team added to competition successfully" };
     } catch (error) {
-        return {
-            type: "error",
-            message: "Error adding team to competition: " + error
-        }
+        return { type: "error", message: `Error adding team to competition: ${error}` };
     }
 }
 
 export async function StateChange(competitionId: number) {
     try {
-        const session = await auth();
-        if (!session) {
-            return {
-                type: "error",
-                message: "You must be logged in to change the state of a competition"
-            }
-        }
-        if (session.user.role !== 'admin') {
-            return {
-                type: "error",
-                message: "You must be an admin to change the state of a competition"
-            }
-        }
-        const compId = Number(competitionId)
+        const authError = await checkAdminAuth();
+        if (authError) return authError;
 
-        // Fetch the current active state
         const currentComp = await db.select({ active: competitions.active })
             .from(competitions)
-            .where(eq(competitions.id, compId))
-            .limit(1)
+            .where(eq(competitions.id, competitionId))
+            .limit(1);
 
         if (currentComp.length === 0) {
-            return {
-                type: "error",
-                message: "Competition not found"
-            }
+            return { type: "error", message: "Competition not found" };
         }
 
-        const newActiveState = !currentComp[0].active
+        const newActiveState = !currentComp[0].active;
 
         await db.update(competitions)
             .set({ active: newActiveState })
-            .where(eq(competitions.id, compId))
+            .where(eq(competitions.id, competitionId));
 
-        revalidatePath("/")
+        revalidatePath("/");
 
-        return {
-            type: "success",
-            message: `Competition set to ${newActiveState ? 'active' : 'inactive'}`
-        }
+        return { type: "success", message: `Competition set to ${newActiveState ? 'active' : 'inactive'}` };
     } catch (error) {
-        return {
-            type: "error",
-            message: "Error changing competition state: " + error
-        }
+        return { type: "error", message: `Error changing competition state: ${error}` };
     }
 }
